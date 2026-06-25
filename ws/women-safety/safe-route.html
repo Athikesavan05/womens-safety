@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Safe Route Navigator — Find nearby police stations, hospitals, and safe zones. Plan safer routes with real-time map.">
+  <title>Safe Route Navigator — SafeGuard</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/animations.css">
+
+  <style>
+    main { position: relative; z-index: 1; }
+
+    .page-header {
+      padding: 120px 0 60px;
+      position: relative; z-index: 1;
+    }
+    .page-header-content { max-width: 700px; }
+    .page-header h1 {
+      font-family: 'Outfit', sans-serif;
+      font-size: clamp(2.2rem, 5vw, 3.2rem);
+      font-weight: 900;
+      margin: 1rem 0;
+    }
+    .page-header p { color: hsl(240,10%,60%); font-size: 1rem; line-height: 1.7; }
+
+    /* MAP LAYOUT */
+    .map-layout {
+      display: grid;
+      grid-template-columns: 340px 1fr;
+      gap: 1.5rem;
+      align-items: flex-start;
+      padding-bottom: 4rem;
+    }
+
+    /* SIDEBAR */
+    .map-sidebar { position: sticky; top: 100px; }
+
+    .sidebar-card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 20px;
+      overflow: hidden;
+      margin-bottom: 1rem;
+    }
+    .sidebar-card-header {
+      padding: 1.25rem 1.5rem;
+      background: rgba(138,43,226,0.1);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      color: hsl(270,60%,75%);
+    }
+
+    /* LOCATION DISPLAY */
+    .my-location {
+      padding: 1.25rem 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .my-location-coords {
+      font-size: 0.82rem;
+      color: hsl(240,10%,55%);
+      font-family: monospace;
+    }
+    .my-location-address {
+      font-size: 0.88rem;
+      color: hsl(240,10%,75%);
+      line-height: 1.5;
+    }
+
+    /* FILTER BUTTONS */
+    .filter-panel { padding: 1.25rem 1.5rem; }
+    .filter-title {
+      font-size: 0.82rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: hsl(240,10%,55%);
+      margin-bottom: 0.75rem;
+    }
+    .filter-btns { display: flex; flex-direction: column; gap: 0.5rem; }
+    .filter-toggle {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem 1rem;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+      color: hsl(240,10%,70%);
+      font-size: 0.88rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .filter-toggle.active {
+      background: rgba(138,43,226,0.15);
+      border-color: rgba(138,43,226,0.3);
+      color: hsl(270,60%,78%);
+    }
+    .filter-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .dot-police  { background: #3b82f6; }
+    .dot-hospital{ background: #ef4444; }
+    .dot-safe    { background: #22c55e; }
+    .filter-toggle:hover { border-color: rgba(138,43,226,0.25); }
+
+    /* POI LIST */
+    .poi-list { padding: 0.75rem 1.5rem 1.25rem; max-height: 280px; overflow-y: auto; }
+    .poi-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      padding: 0.75rem 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .poi-item:last-child { border-bottom: none; }
+    .poi-item:hover { opacity: 0.8; }
+    .poi-icon {
+      width: 36px; height: 36px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.9rem;
+      flex-shrink: 0;
+    }
+    .poi-police   { background: rgba(59,130,246,0.2);  color: #60a5fa; }
+    .poi-hospital { background: rgba(239,68,68,0.2);   color: #f87171; }
+    .poi-safe     { background: rgba(34,197,94,0.2);   color: #4ade80; }
+    .poi-name { font-size: 0.88rem; font-weight: 600; color: hsl(240,10%,85%); }
+    .poi-dist { font-size: 0.78rem; color: hsl(240,10%,50%); margin-top: 2px; }
+
+    /* SAFETY TIPS */
+    .tips-panel { padding: 1.25rem 1.5rem; }
+    .tip-item {
+      display: flex;
+      gap: 0.75rem;
+      padding: 0.6rem 0;
+      font-size: 0.85rem;
+      color: hsl(240,10%,65%);
+      line-height: 1.5;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .tip-item:last-child { border-bottom: none; }
+    .tip-item i { color: hsl(270,60%,68%); margin-top: 2px; flex-shrink: 0; }
+
+    /* MAIN MAP */
+    .map-main {}
+    #main-map {
+      width: 100%;
+      height: 580px;
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,0.08);
+      overflow: hidden;
+      position: relative;
+    }
+    .map-controls {
+      display: flex;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+    }
+    .map-search {
+      flex: 1;
+      display: flex;
+      gap: 0.5rem;
+      min-width: 200px;
+    }
+    .map-search input {
+      flex: 1;
+      padding: 0.7rem 1rem;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      color: #fff;
+      font-size: 0.9rem;
+      font-family: 'Inter', sans-serif;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .map-search input:focus { border-color: rgba(138,43,226,0.5); }
+    .map-search input::placeholder { color: hsl(240,10%,45%); }
+
+    .locate-btn {
+      display: flex; align-items: center; gap: 0.5rem;
+      padding: 0.7rem 1.25rem;
+      background: rgba(138,43,226,0.2);
+      border: 1px solid rgba(138,43,226,0.3);
+      border-radius: 12px;
+      color: hsl(270,60%,75%);
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .locate-btn:hover { background: rgba(138,43,226,0.35); }
+
+    .map-loading {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: rgba(13,10,22,0.9);
+      border-radius: 20px;
+      z-index: 500;
+      gap: 1rem;
+      font-size: 0.9rem;
+      color: hsl(240,10%,60%);
+    }
+    .map-loading-spinner {
+      width: 40px; height: 40px;
+      border: 3px solid rgba(138,43,226,0.2);
+      border-top-color: hsl(270,70%,55%);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    /* LEGEND */
+    .map-legend {
+      display: flex;
+      gap: 1.5rem;
+      margin-top: 1rem;
+      flex-wrap: wrap;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.82rem;
+      color: hsl(240,10%,60%);
+    }
+    .legend-dot {
+      width: 12px; height: 12px;
+      border-radius: 50%;
+    }
+
+    @media (max-width: 900px) {
+      .map-layout { grid-template-columns: 1fr; }
+      .map-sidebar { position: static; }
+      #main-map { height: 420px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="glow-bg" aria-hidden="true">
+    <div class="glow-orb orb-1"></div>
+    <div class="glow-orb orb-2"></div>
+  </div>
+  <div class="page-progress" id="page-progress"></div>
+
+  <!-- NAVBAR -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="logo">
+        <span class="shield-icon"><i class="fa-solid fa-shield-halved"></i></span>
+        <span><span class="text-gradient">Safe</span>Guard</span>
+      </a>
+      <button class="mobile-toggle" id="mobile-toggle" aria-label="Toggle menu"><i class="fa-solid fa-bars"></i></button>
+      <div class="nav-menu" id="nav-menu">
+        <ul class="nav-list">
+          <li><a href="index.html" class="nav-link">Home</a></li>
+          <li><a href="safe-route.html" class="nav-link active">Safe Routes</a></li>
+          <li><a href="cyber-safety.html" class="nav-link">Cyber Safety</a></li>
+          <li><a href="report-incident.html" class="nav-link">Report</a></li>
+          <li><a href="community-alerts.html" class="nav-link">Alerts</a></li>
+          <li><a href="resources.html" class="nav-link">Resources</a></li>
+        </ul>
+        <a href="index.html#sos-trigger" class="nav-sos-btn"><i class="fa-solid fa-bell"></i> SOS</a>
+      </div>
+    </div>
+  </nav>
+
+  <main>
+    <!-- PAGE HEADER -->
+    <div class="page-header">
+      <div class="container">
+        <div class="page-header-content">
+          <span class="section-subtitle">Navigation Safety</span>
+          <h1>Safe Route <span class="text-gradient">Navigator</span></h1>
+          <p>Find nearby police stations, hospitals, and safe zones on your real-time map. Plan routes through well-lit, safer areas — anytime, anywhere.</p>
+          <div style="margin-top:1.5rem;">
+            <span class="badge badge-primary" style="margin-right:0.5rem;"><i class="fa-solid fa-circle-dot" style="color:#22c55e;"></i> Live Map</span>
+            <span class="badge badge-primary"><i class="fa-solid fa-database"></i> OpenStreetMap Data</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MAP SECTION -->
+    <section class="section-padding" style="padding-top:0;">
+      <div class="container">
+        <div class="map-layout">
+
+          <!-- SIDEBAR -->
+          <aside class="map-sidebar">
+            <!-- My Location -->
+            <div class="sidebar-card">
+              <div class="sidebar-card-header">
+                <i class="fa-solid fa-location-crosshairs"></i>
+                My Location
+              </div>
+              <div class="my-location">
+                <div class="my-location-coords" id="my-coords">Fetching location…</div>
+                <div class="my-location-address" id="my-address">Please allow location access</div>
+                <button class="locate-btn" onclick="locateMe()" style="margin-top:0.75rem;width:100%;justify-content:center;">
+                  <i class="fa-solid fa-crosshairs"></i> Re-center Map
+                </button>
+              </div>
+            </div>
+
+            <!-- Filters -->
+            <div class="sidebar-card">
+              <div class="sidebar-card-header">
+                <i class="fa-solid fa-filter"></i>
+                Show On Map
+              </div>
+              <div class="filter-panel">
+                <div class="filter-btns">
+                  <button class="filter-toggle active" id="filter-police" onclick="toggleFilter('police')">
+                    <span class="filter-dot dot-police"></span>
+                    <i class="fa-solid fa-shield"></i>
+                    Police Stations
+                    <span style="margin-left:auto;font-size:0.78rem;background:rgba(59,130,246,0.2);padding:2px 8px;border-radius:999px;" id="count-police">—</span>
+                  </button>
+                  <button class="filter-toggle active" id="filter-hospital" onclick="toggleFilter('hospital')">
+                    <span class="filter-dot dot-hospital"></span>
+                    <i class="fa-solid fa-hospital"></i>
+                    Hospitals
+                    <span style="margin-left:auto;font-size:0.78rem;background:rgba(239,68,68,0.2);padding:2px 8px;border-radius:999px;" id="count-hospital">—</span>
+                  </button>
+                  <button class="filter-toggle active" id="filter-safe" onclick="toggleFilter('safe')">
+                    <span class="filter-dot dot-safe"></span>
+                    <i class="fa-solid fa-house-chimney-medical"></i>
+                    Safe Zones
+                    <span style="margin-left:auto;font-size:0.78rem;background:rgba(34,197,94,0.2);padding:2px 8px;border-radius:999px;" id="count-safe">—</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Nearby POIs -->
+            <div class="sidebar-card">
+              <div class="sidebar-card-header">
+                <i class="fa-solid fa-location-pin"></i>
+                Nearby Places
+              </div>
+              <div class="poi-list" id="poi-list">
+                <div style="text-align:center;padding:1.5rem;color:hsl(240,10%,50%);font-size:0.88rem;">
+                  <i class="fa-solid fa-spinner anim-spin" style="margin-bottom:0.5rem;display:block;font-size:1.5rem;"></i>
+                  Loading nearby places…
+                </div>
+              </div>
+            </div>
+
+            <!-- Safety Tips -->
+            <div class="sidebar-card">
+              <div class="sidebar-card-header">
+                <i class="fa-solid fa-lightbulb"></i>
+                Route Safety Tips
+              </div>
+              <div class="tips-panel">
+                <div class="tip-item"><i class="fa-solid fa-check-circle"></i> Prefer well-lit and busy streets, especially at night.</div>
+                <div class="tip-item"><i class="fa-solid fa-check-circle"></i> Share your live location with a trusted contact.</div>
+                <div class="tip-item"><i class="fa-solid fa-check-circle"></i> Note nearby police stations before starting your journey.</div>
+                <div class="tip-item"><i class="fa-solid fa-check-circle"></i> Avoid deserted shortcuts and alleys after dark.</div>
+                <div class="tip-item"><i class="fa-solid fa-check-circle"></i> Keep your phone charged and location services on.</div>
+                <div class="tip-item"><i class="fa-solid fa-check-circle"></i> Trust your instincts — if something feels wrong, leave.</div>
+              </div>
+            </div>
+          </aside>
+
+          <!-- MAIN MAP -->
+          <div class="map-main">
+            <div class="map-controls">
+              <div class="map-search">
+                <input type="text" id="dest-search" placeholder="Search for a destination…" aria-label="Search destination">
+                <button class="locate-btn" onclick="searchDestination()">
+                  <i class="fa-solid fa-magnifying-glass"></i> Search
+                </button>
+              </div>
+              <button class="locate-btn" onclick="locateMe()">
+                <i class="fa-solid fa-location-arrow"></i> My Location
+              </button>
+            </div>
+
+            <div style="position:relative;">
+              <div id="main-map" role="application" aria-label="Safety map"></div>
+              <div class="map-loading" id="map-loading">
+                <div class="map-loading-spinner"></div>
+                <span>Loading map and fetching nearby places…</span>
+              </div>
+            </div>
+
+            <div class="map-legend">
+              <div class="legend-item"><span class="legend-dot" style="background:#3b82f6;"></span> Police Station</div>
+              <div class="legend-item"><span class="legend-dot" style="background:#ef4444;"></span> Hospital</div>
+              <div class="legend-item"><span class="legend-dot" style="background:#22c55e;"></span> Safe Zone</div>
+              <div class="legend-item"><span class="legend-dot" style="background:#a855f7;"></span> My Location</div>
+              <div class="legend-item" style="margin-left:auto;font-size:0.78rem;color:hsl(240,10%,45%);">
+                <i class="fa-solid fa-database" style="margin-right:4px;"></i> Data: © OpenStreetMap contributors
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-container">
+      <div class="footer-bottom" style="border-top:none;padding-top:0;">
+        <p style="color:hsl(240,10%,45%);font-size:0.85rem;">© 2026 SafeGuard Women Safety System. Stay safe, stay informed.</p>
+        <a href="index.html" style="color:hsl(270,60%,68%);font-size:0.85rem;"><i class="fa-solid fa-arrow-left" style="margin-right:6px;"></i>Back to Home</a>
+      </div>
+    </div>
+  </footer>
+
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/map.js"></script>
+</body>
+</html>

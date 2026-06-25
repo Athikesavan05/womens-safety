@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Safety Resources — Emergency numbers, women's helplines, legal guidance under IPC & IT Act, and NGO directory for women's safety in India.">
+  <title>Safety Resources — SafeGuard</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/animations.css">
+
+  <style>
+    main { position:relative; z-index:1; }
+    .page-header { padding:120px 0 60px; }
+    .page-header h1 { font-family:'Outfit',sans-serif; font-size:clamp(2.2rem,5vw,3.2rem); font-weight:900; margin:1rem 0; }
+    .page-header p  { color:hsl(240,10%,60%); font-size:1rem; line-height:1.7; max-width:660px; }
+
+    /* SECTION TABS */
+    .res-tabs {
+      display:flex;gap:0.5rem;margin-bottom:3rem;flex-wrap:wrap;
+    }
+    .res-tab {
+      display:flex;align-items:center;gap:0.6rem;
+      padding:0.7rem 1.25rem;
+      border-radius:12px;
+      background:rgba(255,255,255,0.04);
+      border:1px solid rgba(255,255,255,0.08);
+      color:hsl(240,10%,60%);
+      font-size:0.88rem;font-weight:600;cursor:pointer;
+      transition:all 0.2s;white-space:nowrap;
+    }
+    .res-tab:hover { background:rgba(138,43,226,0.1);border-color:rgba(138,43,226,0.25); }
+    .res-tab.active { background:rgba(138,43,226,0.18);border-color:rgba(138,43,226,0.4);color:hsl(270,60%,80%);box-shadow:0 0 20px rgba(138,43,226,0.15); }
+
+    /* EMERGENCY NUMBERS */
+    .emergency-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1.25rem;margin-bottom:3rem; }
+    .emergency-card {
+      padding:1.75rem;border-radius:18px;
+      background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);
+      transition:all 0.3s cubic-bezier(0.34,1.56,0.64,1);
+      text-decoration:none;display:flex;align-items:center;gap:1.25rem;
+    }
+    .emergency-card:hover { transform:translateY(-4px);border-color:rgba(239,68,68,0.4);box-shadow:0 16px 48px rgba(0,0,0,0.4),0 0 30px rgba(239,68,68,0.15); }
+    .em-icon {
+      width:56px;height:56px;border-radius:14px;
+      display:flex;align-items:center;justify-content:center;
+      font-size:1.4rem;flex-shrink:0;
+    }
+    .em-number { font-family:'Outfit',sans-serif;font-size:1.8rem;font-weight:900;line-height:1; }
+    .em-label  { font-size:0.85rem;color:hsl(240,10%,55%);margin-top:3px; }
+
+    /* HELPLINES */
+    .helplines-list { display:flex;flex-direction:column;gap:1rem;margin-bottom:3rem; }
+    .helpline-card {
+      padding:1.5rem 2rem;border-radius:16px;
+      background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);
+      display:flex;align-items:center;gap:1.5rem;
+      transition:all 0.25s;
+    }
+    .helpline-card:hover { border-color:rgba(138,43,226,0.3);background:rgba(138,43,226,0.06); }
+    .helpline-logo {
+      width:52px;height:52px;border-radius:14px;
+      display:flex;align-items:center;justify-content:center;
+      font-size:1.3rem;flex-shrink:0;
+    }
+    .helpline-name { font-family:'Outfit',sans-serif;font-weight:700;font-size:1rem; }
+    .helpline-desc { font-size:0.85rem;color:hsl(240,10%,55%);margin-top:3px;line-height:1.5; }
+    .helpline-actions { display:flex;gap:0.75rem;margin-left:auto;flex-shrink:0; }
+    .call-btn {
+      display:flex;align-items:center;gap:0.5rem;
+      padding:0.6rem 1.25rem;
+      border-radius:12px;
+      background:rgba(34,197,94,0.15);
+      border:1px solid rgba(34,197,94,0.25);
+      color:hsl(150,65%,60%);
+      font-size:0.85rem;font-weight:700;
+      text-decoration:none;
+      transition:all 0.2s;
+      white-space:nowrap;
+    }
+    .call-btn:hover { background:rgba(34,197,94,0.25); }
+
+    /* LEGAL SECTION */
+    .legal-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:1.25rem;margin-bottom:3rem; }
+    .legal-card {
+      padding:1.75rem;border-radius:18px;
+      background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);
+      transition:border-color 0.25s;
+    }
+    .legal-card:hover { border-color:rgba(138,43,226,0.3); }
+    .legal-card-header { display:flex;align-items:center;gap:0.75rem;margin-bottom:1rem; }
+    .legal-section-tag {
+      font-family:'Outfit',sans-serif;font-weight:800;font-size:0.88rem;
+      padding:4px 12px;border-radius:999px;
+      background:rgba(138,43,226,0.2);color:hsl(270,60%,78%);
+      border:1px solid rgba(138,43,226,0.3);
+    }
+    .legal-type { font-size:0.78rem;color:hsl(240,10%,50%); }
+    .legal-card h3 { font-family:'Outfit',sans-serif;font-weight:700;font-size:1rem;margin-bottom:0.5rem; }
+    .legal-card p  { font-size:0.87rem;color:hsl(240,10%,60%);line-height:1.7; }
+    .penalty-tag {
+      display:inline-flex;align-items:center;gap:4px;
+      margin-top:0.75rem;font-size:0.78rem;font-weight:600;
+      padding:3px 10px;border-radius:999px;
+      background:rgba(239,68,68,0.12);color:hsl(0,85%,72%);
+      border:1px solid rgba(239,68,68,0.2);
+    }
+
+    /* NGO DIRECTORY */
+    .ngo-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1.25rem;margin-bottom:3rem; }
+    .ngo-card {
+      padding:1.75rem;border-radius:18px;
+      background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);
+      transition:all 0.25s;
+    }
+    .ngo-card:hover { border-color:rgba(138,43,226,0.3);transform:translateY(-2px); }
+    .ngo-name { font-family:'Outfit',sans-serif;font-weight:800;font-size:1rem;margin-bottom:0.4rem; }
+    .ngo-focus { font-size:0.78rem;color:hsl(270,60%,70%);margin-bottom:0.75rem; }
+    .ngo-desc  { font-size:0.85rem;color:hsl(240,10%,58%);line-height:1.65;margin-bottom:1rem; }
+    .ngo-contact { display:flex;flex-direction:column;gap:0.4rem; }
+    .ngo-contact a { font-size:0.83rem;color:hsl(240,10%,65%);display:flex;align-items:center;gap:0.5rem;transition:color 0.2s; }
+    .ngo-contact a:hover { color:hsl(270,60%,72%); }
+    .ngo-contact a i { width:14px;flex-shrink:0; }
+
+    /* CYBER RESOURCES */
+    .cyber-resource-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1.25rem;margin-bottom:3rem; }
+    .cyber-card {
+      padding:1.75rem;border-radius:18px;
+      background:rgba(59,130,246,0.06);border:1px solid rgba(59,130,246,0.15);
+      text-decoration:none;display:block;transition:all 0.25s;
+    }
+    .cyber-card:hover { border-color:rgba(59,130,246,0.35);transform:translateY(-3px);background:rgba(59,130,246,0.1); }
+    .cyber-card-icon { font-size:2rem;color:hsl(210,80%,65%);margin-bottom:1rem; }
+    .cyber-card h3 { font-family:'Outfit',sans-serif;font-weight:700;font-size:1rem;margin-bottom:0.4rem; }
+    .cyber-card p  { font-size:0.85rem;color:hsl(240,10%,58%);line-height:1.65;margin-bottom:0.75rem; }
+    .cyber-card-link { font-size:0.82rem;color:hsl(210,80%,65%);display:flex;align-items:center;gap:6px; }
+
+    /* SECTION SEPARATOR */
+    .res-section { margin-bottom:3.5rem; }
+    .res-section-header { margin-bottom:1.75rem; }
+    .res-section-header h2 { font-family:'Outfit',sans-serif;font-size:1.5rem;font-weight:800;margin-bottom:0.4rem; }
+    .res-section-header p  { color:hsl(240,10%,55%);font-size:0.9rem; }
+
+    /* QUICK COPY */
+    .copy-btn {
+      cursor:pointer;padding:4px 10px;border-radius:8px;
+      background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);
+      color:hsl(240,10%,60%);font-size:0.78rem;font-weight:600;
+      transition:all 0.2s;margin-left:0.5rem;
+    }
+    .copy-btn:hover { background:rgba(138,43,226,0.15);color:hsl(270,60%,72%); }
+
+    @media (max-width:700px) {
+      .helpline-card { flex-wrap:wrap; }
+      .helpline-actions { margin-left:0;width:100%; }
+    }
+  </style>
+</head>
+<body>
+  <div class="glow-bg" aria-hidden="true"><div class="glow-orb orb-1"></div><div class="glow-orb orb-2"></div><div class="glow-orb orb-3"></div></div>
+  <div class="page-progress" id="page-progress"></div>
+
+  <nav class="navbar" id="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="logo"><span class="shield-icon"><i class="fa-solid fa-shield-halved"></i></span><span><span class="text-gradient">Safe</span>Guard</span></a>
+      <button class="mobile-toggle" id="mobile-toggle" aria-label="Toggle menu"><i class="fa-solid fa-bars"></i></button>
+      <div class="nav-menu" id="nav-menu">
+        <ul class="nav-list">
+          <li><a href="index.html" class="nav-link">Home</a></li>
+          <li><a href="safe-route.html" class="nav-link">Safe Routes</a></li>
+          <li><a href="cyber-safety.html" class="nav-link">Cyber Safety</a></li>
+          <li><a href="report-incident.html" class="nav-link">Report</a></li>
+          <li><a href="community-alerts.html" class="nav-link">Alerts</a></li>
+          <li><a href="resources.html" class="nav-link active">Resources</a></li>
+        </ul>
+        <a href="index.html" class="nav-sos-btn"><i class="fa-solid fa-bell"></i> SOS</a>
+      </div>
+    </div>
+  </nav>
+
+  <main>
+    <div class="page-header">
+      <div class="container">
+        <span class="section-subtitle">Knowledge & Support</span>
+        <h1>Safety <span class="text-gradient">Resources</span></h1>
+        <p>A comprehensive directory of emergency contacts, women's helplines, legal protections, NGOs, and online safety resources — all in one place.</p>
+        <div style="margin-top:1.5rem;">
+          <span class="badge badge-primary" style="margin-right:0.5rem;"><i class="fa-solid fa-phone"></i> 20+ Helplines</span>
+          <span class="badge badge-primary" style="margin-right:0.5rem;"><i class="fa-solid fa-scale-balanced"></i> Legal Guide</span>
+          <span class="badge badge-primary"><i class="fa-solid fa-building"></i> NGO Directory</span>
+        </div>
+      </div>
+    </div>
+
+    <section class="section-padding" style="padding-top:0;">
+      <div class="container">
+
+        <!-- SECTION TABS -->
+        <div class="res-tabs" role="tablist">
+          <button class="res-tab active" onclick="showSection('emergency')" id="tab-emergency"><i class="fa-solid fa-phone-volume"></i>Emergency Numbers</button>
+          <button class="res-tab" onclick="showSection('helplines')" id="tab-helplines"><i class="fa-solid fa-venus"></i>Women Helplines</button>
+          <button class="res-tab" onclick="showSection('legal')" id="tab-legal"><i class="fa-solid fa-scale-balanced"></i>Legal Guidance</button>
+          <button class="res-tab" onclick="showSection('ngo')" id="tab-ngo"><i class="fa-solid fa-building-user"></i>NGO Directory</button>
+          <button class="res-tab" onclick="showSection('cyber')" id="tab-cyber"><i class="fa-solid fa-shield-halved"></i>Cyber Resources</button>
+        </div>
+
+        <!-- ===== EMERGENCY NUMBERS ===== -->
+        <div id="section-emergency" class="res-section">
+          <div class="res-section-header">
+            <h2><i class="fa-solid fa-phone-volume" style="color:#ef4444;margin-right:0.5rem;"></i>National Emergency Numbers</h2>
+            <p>Tap any number to call immediately. Save these to your contacts for quick access.</p>
+          </div>
+          <div class="emergency-grid">
+            <a href="tel:112" class="emergency-card reveal">
+              <div class="em-icon" style="background:rgba(239,68,68,0.2);color:#f87171;"><i class="fa-solid fa-truck-medical"></i></div>
+              <div><div class="em-number" style="color:#f87171;">112</div><div class="em-label">National Emergency Helpline</div></div>
+            </a>
+            <a href="tel:100" class="emergency-card reveal reveal-delay-1">
+              <div class="em-icon" style="background:rgba(59,130,246,0.2);color:#60a5fa;"><i class="fa-solid fa-shield"></i></div>
+              <div><div class="em-number" style="color:#60a5fa;">100</div><div class="em-label">Police</div></div>
+            </a>
+            <a href="tel:102" class="emergency-card reveal reveal-delay-2">
+              <div class="em-icon" style="background:rgba(239,68,68,0.2);color:#f87171;"><i class="fa-solid fa-truck-medical"></i></div>
+              <div><div class="em-number" style="color:#f87171;">102</div><div class="em-label">Ambulance</div></div>
+            </a>
+            <a href="tel:1091" class="emergency-card reveal reveal-delay-3">
+              <div class="em-icon" style="background:rgba(168,85,247,0.2);color:#c084fc;"><i class="fa-solid fa-venus"></i></div>
+              <div><div class="em-number" style="color:#c084fc;">1091</div><div class="em-label">Women Helpline (National)</div></div>
+            </a>
+            <a href="tel:181" class="emergency-card reveal reveal-delay-4">
+              <div class="em-icon" style="background:rgba(236,72,153,0.2);color:#f472b6;"><i class="fa-solid fa-hand-holding-heart"></i></div>
+              <div><div class="em-number" style="color:#f472b6;">181</div><div class="em-label">Women Helpline (WCD)</div></div>
+            </a>
+            <a href="tel:1930" class="emergency-card reveal reveal-delay-5">
+              <div class="em-icon" style="background:rgba(14,165,233,0.2);color:#38bdf8;"><i class="fa-solid fa-computer"></i></div>
+              <div><div class="em-number" style="color:#38bdf8;">1930</div><div class="em-label">Cyber Crime Helpline</div></div>
+            </a>
+            <a href="tel:1098" class="emergency-card reveal">
+              <div class="em-icon" style="background:rgba(245,158,11,0.2);color:#fbbf24;"><i class="fa-solid fa-child-reaching"></i></div>
+              <div><div class="em-number" style="color:#fbbf24;">1098</div><div class="em-label">Childline</div></div>
+            </a>
+            <a href="tel:101" class="emergency-card reveal reveal-delay-1">
+              <div class="em-icon" style="background:rgba(239,68,68,0.2);color:#f87171;"><i class="fa-solid fa-fire"></i></div>
+              <div><div class="em-number" style="color:#f87171;">101</div><div class="em-label">Fire Station</div></div>
+            </a>
+            <a href="tel:14567" class="emergency-card reveal reveal-delay-2">
+              <div class="em-icon" style="background:rgba(34,197,94,0.2);color:#4ade80;"><i class="fa-solid fa-person-cane"></i></div>
+              <div><div class="em-number" style="color:#4ade80;">14567</div><div class="em-label">Senior Citizen Helpline</div></div>
+            </a>
+          </div>
+        </div>
+
+        <!-- ===== HELPLINES ===== -->
+        <div id="section-helplines" class="res-section" style="display:none;">
+          <div class="res-section-header">
+            <h2><i class="fa-solid fa-hand-holding-heart" style="color:#c084fc;margin-right:0.5rem;"></i>Women's Helplines & Support Organisations</h2>
+            <p>These organisations provide counselling, legal aid, shelter, and support to women in distress.</p>
+          </div>
+          <div class="helplines-list">
+            <div class="helpline-card reveal">
+              <div class="helpline-logo" style="background:rgba(168,85,247,0.2);color:#c084fc;"><i class="fa-solid fa-balance-scale"></i></div>
+              <div>
+                <div class="helpline-name">One Stop Centre (OSC)</div>
+                <div class="helpline-desc">Government facility providing shelter, medical, police, legal, and psychosocial support under one roof. Available at district level nationwide.</div>
+              </div>
+              <div class="helpline-actions">
+                <a href="tel:181" class="call-btn"><i class="fa-solid fa-phone"></i>Call 181</a>
+              </div>
+            </div>
+            <div class="helpline-card reveal reveal-delay-1">
+              <div class="helpline-logo" style="background:rgba(236,72,153,0.2);color:#f472b6;"><i class="fa-solid fa-heart-pulse"></i></div>
+              <div>
+                <div class="helpline-name">Shakti Shalini</div>
+                <div class="helpline-desc">NGO offering shelter, legal aid, and counselling to women and children facing domestic violence, sexual assault, and trafficking in Delhi.</div>
+              </div>
+              <div class="helpline-actions">
+                <a href="tel:011-24373736" class="call-btn"><i class="fa-solid fa-phone"></i>011-24373736</a>
+              </div>
+            </div>
+            <div class="helpline-card reveal reveal-delay-2">
+              <div class="helpline-logo" style="background:rgba(59,130,246,0.2);color:#60a5fa;"><i class="fa-solid fa-brain"></i></div>
+              <div>
+                <div class="helpline-name">iCall (TISS)</div>
+                <div class="helpline-desc">Psychosocial helpline by Tata Institute of Social Sciences offering counselling for mental health, trauma, abuse, and gender violence. Mon–Sat 8AM–10PM.</div>
+              </div>
+              <div class="helpline-actions">
+                <a href="tel:9152987821" class="call-btn"><i class="fa-solid fa-phone"></i>9152987821</a>
+              </div>
+            </div>
+            <div class="helpline-card reveal reveal-delay-3">
+              <div class="helpline-logo" style="background:rgba(34,197,94,0.2);color:#4ade80;"><i class="fa-solid fa-house-chimney-heart"></i></div>
+              <div>
+                <div class="helpline-name">SNEHI (Mental Health)</div>
+                <div class="helpline-desc">Emotional support helpline providing confidential counselling for women facing trauma, grief, abuse, and psychological distress. All calls confidential.</div>
+              </div>
+              <div class="helpline-actions">
+                <a href="tel:044-24640050" class="call-btn"><i class="fa-solid fa-phone"></i>044-24640050</a>
+              </div>
+            </div>
+            <div class="helpline-card reveal reveal-delay-4">
+              <div class="helpline-logo" style="background:rgba(245,158,11,0.2);color:#fbbf24;"><i class="fa-solid fa-gavel"></i></div>
+              <div>
+                <div class="helpline-name">National Commission for Women</div>
+                <div class="helpline-desc">Statutory body addressing violations of women's rights, providing legal redressal, and conducting investigations into complaints against women's interests.</div>
+              </div>
+              <div class="helpline-actions">
+                <a href="tel:7827170170" class="call-btn"><i class="fa-solid fa-phone"></i>7827170170</a>
+              </div>
+            </div>
+            <div class="helpline-card reveal reveal-delay-5">
+              <div class="helpline-logo" style="background:rgba(239,68,68,0.2);color:#f87171;"><i class="fa-solid fa-building-ngo"></i></div>
+              <div>
+                <div class="helpline-name">POSH (Sexual Harassment at Work)</div>
+                <div class="helpline-desc">If you face sexual harassment at the workplace, report to your Internal Complaints Committee (ICC). Report to District Officer if no ICC exists.</div>
+              </div>
+              <div class="helpline-actions">
+                <a href="https://shebox.nic.in" target="_blank" rel="noopener" class="call-btn" style="color:hsl(210,80%,65%);background:rgba(59,130,246,0.15);border-color:rgba(59,130,246,0.25);">
+                  <i class="fa-solid fa-external-link-alt"></i>SHeBox Portal
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== LEGAL GUIDANCE ===== -->
+        <div id="section-legal" class="res-section" style="display:none;">
+          <div class="res-section-header">
+            <h2><i class="fa-solid fa-scale-balanced" style="color:#fbbf24;margin-right:0.5rem;"></i>Legal Protections for Women in India</h2>
+            <p>Know your rights under the Indian Penal Code (IPC), IT Act, and other laws. Knowledge is power.</p>
+          </div>
+
+          <h3 style="font-family:'Outfit',sans-serif;font-weight:700;font-size:1.1rem;margin-bottom:1rem;color:hsl(270,60%,72%);">
+            <i class="fa-solid fa-book" style="margin-right:8px;"></i>Indian Penal Code (IPC)
+          </h3>
+          <div class="legal-grid" style="margin-bottom:2rem;">
+            <div class="legal-card reveal">
+              <div class="legal-card-header"><span class="legal-section-tag">IPC 354</span><span class="legal-type">Physical Safety</span></div>
+              <h3>Assault / Outraging Modesty</h3>
+              <p>Whoever assaults or uses criminal force to any woman, intending to outrage or knowing it likely to outrage her modesty.</p>
+              <span class="penalty-tag"><i class="fa-solid fa-gavel"></i>Up to 2 years imprisonment + fine</span>
+            </div>
+            <div class="legal-card reveal reveal-delay-1">
+              <div class="legal-card-header"><span class="legal-section-tag">IPC 354A</span><span class="legal-type">Sexual Harassment</span></div>
+              <h3>Sexual Harassment</h3>
+              <p>Physical contact with sexual overtones, demand for sexual favours, showing pornography against will, or making sexually coloured remarks.</p>
+              <span class="penalty-tag"><i class="fa-solid fa-gavel"></i>Up to 3 years + fine</span>
+            </div>
+            <div class="legal-card reveal reveal-delay-2">
+              <div class="legal-card-header"><span class="legal-section-tag">IPC 354D</span><span class="legal-type">Stalking</span></div>
+              <h3>Stalking</h3>
+              <p>Following, contacting, or monitoring a woman's internet/email use against her explicit indication of disinterest. Repeat offences carry higher penalties.</p>
+              <span class="penalty-tag"><i class="fa-solid fa-gavel"></i>1st offence: 3 years; Repeat: 5 years</span>
+            </div>
+            <div class="legal-card reveal reveal-delay-3">
+              <div class="legal-card-header"><span class="legal-section-tag">IPC 376</span><span class="legal-type">Sexual Violence</span></div>
+              <h3>Rape</h3>
+              <p>Sexual intercourse without consent. Post-2013 Criminal Law Amendment covers a wider definition including penetration under force, threat, or incapacity.</p>
+              <span class="penalty-tag"><i class="fa-solid fa-gavel"></i>Minimum 10 years to life imprisonment</span>
+            </div>
+            <div class="legal-card reveal reveal-delay-4">
+              <div class="legal-card-header"><span class="legal-section-tag">IPC 498A</span><span class="legal-type">Domestic Violence</span></div>
+              <h3>Cruelty by Husband/Relatives</h3>
+              <p>Cruelty to a woman by her husband or his relatives, including physical, mental, or dowry-related harassment.</p>
+              <span class="penalty-tag"><i class="fa-solid fa-gavel"></i>Up to 3 years + fine</span>
+            </div>
+            <div class="legal-card reveal reveal-delay-5">
+              <div class="legal-card-header"><span class="legal-section-tag">IPC 509</span><span class="legal-type">Verbal Abuse</span></div>
+              <h3>Insulting Modesty of Woman</h3>
+              <p>Words, gestures, or acts intended to insult the modesty of any woman, including catcalling, lewd comments, or obscene gestures in public.</p>
+              <span class="penalty-tag"><i class="fa-solid fa-gavel"></i>Up to 3 years + fine</span>
+            </div>
+          </div>
+
+          <h3 style="font-family:'Outfit',sans-serif;font-weight:700;font-size:1.1rem;margin-bottom:1rem;color:hsl(210,80%,65%);">
+            <i class="fa-solid fa-computer" style="margin-right:8px;"></i>Information Technology (IT) Act
+          </h3>
+          <div class="legal-grid">
+            <div class="legal-card reveal" style="border-color:rgba(59,130,246,0.15);">
+              <div class="legal-card-header"><span class="legal-section-tag" style="background:rgba(59,130,246,0.2);color:hsl(210,80%,75%);border-color:rgba(59,130,246,0.3);">IT Act 66C</span><span class="legal-type">Cyber Crime</span></div>
+              <h3>Identity Theft</h3>
+              <p>Fraudulently or dishonestly making use of any person's electronic signature, password, or unique identification feature.</p>
+              <span class="penalty-tag"><i class="fa-solid fa-gavel"></i>Up to 3 years + ₹1 lakh fine</span>
+            </div>
+            <div class="legal-card reveal reveal-delay-1" style="border-color:rgba(59,130,246,0.15);">
+              <div class="legal-card-header"><span class="legal-section-tag" style="background:rgba(59,130,246,0.2);color:hsl(210,80%,75%);border-color:rgba(59,130,246,0.3);">IT Act 66E</span><span class="legal-type">Cyber Crime</span></div>
+              <h3>Violation of Privacy</h3>
+              <p>Intentionally capturing, publishing, or transmitting image of private area of any person without consent in circumstances violating privacy.</p>
+              <span class="penalty-tag"><i class="fa-solid fa-gavel"></i>Up to 3 years + ₹2 lakh fine</span>
+            </div>
+            <div class="legal-card reveal reveal-delay-2" style="border-color:rgba(59,130,246,0.15);">
+              <div class="legal-card-header"><span class="legal-section-tag" style="background:rgba(59,130,246,0.2);color:hsl(210,80%,75%);border-color:rgba(59,130,246,0.3);">IT Act 67A</span><span class="legal-type">Cyber Crime</span></div>
+              <h3>Sexually Explicit Content Online</h3>
+              <p>Publishing or transmitting sexually explicit act or conduct in electronic form. Includes morphed images, revenge porn, and non-consensual sharing.</p>
+              <span class="penalty-tag"><i class="fa-solid fa-gavel"></i>Up to 5 years + ₹10 lakh fine</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== NGO DIRECTORY ===== -->
+        <div id="section-ngo" class="res-section" style="display:none;">
+          <div class="res-section-header">
+            <h2><i class="fa-solid fa-building-user" style="color:#4ade80;margin-right:0.5rem;"></i>NGO & Support Organisation Directory</h2>
+            <p>Trusted non-profit organisations providing shelter, legal aid, counselling, and rehabilitation support for women across India.</p>
+          </div>
+          <div class="ngo-grid">
+            <div class="ngo-card reveal">
+              <div class="ngo-name">Jagori</div>
+              <div class="ngo-focus">Women's rights, safety, gender education</div>
+              <div class="ngo-desc">Delhi-based feminist organisation working on gender sensitisation, safe city initiatives, survivor support, and capacity building for grassroots organisations.</div>
+              <div class="ngo-contact">
+                <a href="tel:011-26692700"><i class="fa-solid fa-phone"></i>011-26692700</a>
+                <a href="http://jagori.org" target="_blank" rel="noopener"><i class="fa-solid fa-globe"></i>jagori.org</a>
+              </div>
+            </div>
+            <div class="ngo-card reveal reveal-delay-1">
+              <div class="ngo-name">Majlis</div>
+              <div class="ngo-focus">Legal aid, domestic violence, labour rights</div>
+              <div class="ngo-desc">Mumbai-based legal support organisation for women and children facing domestic violence, rape, sexual harassment, and worker exploitation.</div>
+              <div class="ngo-contact">
+                <a href="tel:022-23827091"><i class="fa-solid fa-phone"></i>022-23827091</a>
+                <a href="http://majlislaw.com" target="_blank" rel="noopener"><i class="fa-solid fa-globe"></i>majlislaw.com</a>
+              </div>
+            </div>
+            <div class="ngo-card reveal reveal-delay-2">
+              <div class="ngo-name">Prajwala</div>
+              <div class="ngo-focus">Anti-trafficking, rehabilitation</div>
+              <div class="ngo-desc">Hyderabad-based NGO fighting human trafficking and sexual exploitation, providing rescue, rehabilitation, and reintegration for survivors of trafficking.</div>
+              <div class="ngo-contact">
+                <a href="tel:040-23547728"><i class="fa-solid fa-phone"></i>040-23547728</a>
+                <a href="http://prajwala.info" target="_blank" rel="noopener"><i class="fa-solid fa-globe"></i>prajwala.info</a>
+              </div>
+            </div>
+            <div class="ngo-card reveal reveal-delay-3">
+              <div class="ngo-name">Swayam</div>
+              <div class="ngo-focus">Domestic violence, women's empowerment</div>
+              <div class="ngo-desc">Kolkata-based organisation working to prevent violence against women through legal aid, crisis support, awareness, and community-based programmes.</div>
+              <div class="ngo-contact">
+                <a href="tel:033-24190904"><i class="fa-solid fa-phone"></i>033-24190904</a>
+                <a href="http://swayam.info" target="_blank" rel="noopener"><i class="fa-solid fa-globe"></i>swayam.info</a>
+              </div>
+            </div>
+            <div class="ngo-card reveal reveal-delay-4">
+              <div class="ngo-name">Vimochana</div>
+              <div class="ngo-focus">Women's rights, dowry deaths, crisis support</div>
+              <div class="ngo-desc">Bangalore-based group addressing dowry deaths, domestic violence, and legal rights of women since 1979. Provides counselling and crisis intervention.</div>
+              <div class="ngo-contact">
+                <a href="tel:080-25492781"><i class="fa-solid fa-phone"></i>080-25492781</a>
+              </div>
+            </div>
+            <div class="ngo-card reveal reveal-delay-5">
+              <div class="ngo-name">iPartner India</div>
+              <div class="ngo-focus">Digital safety, cyber harassment</div>
+              <div class="ngo-desc">Technology-focused NGO providing support to women and girls facing online harassment, privacy violations, and digital rights infringement.</div>
+              <div class="ngo-contact">
+                <a href="mailto:support@ipartnerindia.org"><i class="fa-solid fa-envelope"></i>support@ipartnerindia.org</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== CYBER RESOURCES ===== -->
+        <div id="section-cyber" class="res-section" style="display:none;">
+          <div class="res-section-header">
+            <h2><i class="fa-solid fa-shield-halved" style="color:#38bdf8;margin-right:0.5rem;"></i>Cyber Safety Resources & Reporting Portals</h2>
+            <p>Official portals and tools for reporting cybercrime, protecting your digital identity, and staying safe online.</p>
+          </div>
+          <div class="cyber-resource-grid">
+            <a href="https://cybercrime.gov.in" target="_blank" rel="noopener" class="cyber-card reveal">
+              <div class="cyber-card-icon"><i class="fa-solid fa-gavel"></i></div>
+              <h3>National Cybercrime Reporting Portal</h3>
+              <p>Official Government of India portal to report cybercrimes including online harassment, financial fraud, fake profiles, and more.</p>
+              <span class="cyber-card-link"><i class="fa-solid fa-external-link-alt"></i>cybercrime.gov.in</span>
+            </a>
+            <a href="https://cert-in.org.in" target="_blank" rel="noopener" class="cyber-card reveal reveal-delay-1">
+              <div class="cyber-card-icon"><i class="fa-solid fa-bug-slash"></i></div>
+              <h3>CERT-In (Computer Emergency Response Team)</h3>
+              <p>India's nodal agency for cybersecurity incidents. Report phishing, malware, website vulnerabilities, and data breaches.</p>
+              <span class="cyber-card-link"><i class="fa-solid fa-external-link-alt"></i>cert-in.org.in</span>
+            </a>
+            <a href="https://shebox.nic.in" target="_blank" rel="noopener" class="cyber-card reveal reveal-delay-2">
+              <div class="cyber-card-icon"><i class="fa-solid fa-user-shield"></i></div>
+              <h3>SHeBox — Sexual Harassment at Workplace</h3>
+              <p>Online complaint portal for women employees (government and private) to report sexual harassment at the workplace under POSH Act.</p>
+              <span class="cyber-card-link"><i class="fa-solid fa-external-link-alt"></i>shebox.nic.in</span>
+            </a>
+            <a href="https://haveibeenpwned.com" target="_blank" rel="noopener" class="cyber-card reveal reveal-delay-3">
+              <div class="cyber-card-icon"><i class="fa-solid fa-key"></i></div>
+              <h3>Have I Been Pwned?</h3>
+              <p>Check if your email address or phone number has been exposed in a known data breach. Take action to secure compromised accounts.</p>
+              <span class="cyber-card-link"><i class="fa-solid fa-external-link-alt"></i>haveibeenpwned.com</span>
+            </a>
+            <a href="https://www.stopncii.org" target="_blank" rel="noopener" class="cyber-card reveal reveal-delay-4">
+              <div class="cyber-card-icon"><i class="fa-solid fa-image-portrait"></i></div>
+              <h3>StopNCII — Non-Consensual Intimate Images</h3>
+              <p>International tool to prevent non-consensual sharing of intimate images. Generate a hash of your photo without uploading it to stop its spread.</p>
+              <span class="cyber-card-link"><i class="fa-solid fa-external-link-alt"></i>stopncii.org</span>
+            </a>
+            <div class="cyber-card reveal reveal-delay-5" style="cursor:default;">
+              <div class="cyber-card-icon"><i class="fa-solid fa-phone-volume"></i></div>
+              <h3>Cyber Crime Helpline</h3>
+              <p>For immediate assistance with cybercrime including online fraud, harassment, stalking, and identity theft. Available 24/7 nationwide.</p>
+              <a href="tel:1930" class="call-btn" style="display:inline-flex;margin-top:0.5rem;"><i class="fa-solid fa-phone"></i>Call 1930</a>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-bottom" style="border-top:1px solid rgba(255,255,255,0.06);padding-top:2rem;">
+        <p style="color:hsl(240,10%,45%);font-size:0.85rem;">© 2026 SafeGuard Women Safety & Cyber Protection System.</p>
+        <div style="display:flex;gap:1.5rem;align-items:center;flex-wrap:wrap;">
+          <a href="index.html" style="color:hsl(270,60%,68%);font-size:0.85rem;">Home</a>
+          <a href="safe-route.html" style="color:hsl(270,60%,68%);font-size:0.85rem;">Safe Routes</a>
+          <a href="cyber-safety.html" style="color:hsl(270,60%,68%);font-size:0.85rem;">Cyber Safety</a>
+          <a href="report-incident.html" style="color:hsl(270,60%,68%);font-size:0.85rem;">Report</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <div id="toast-container" class="toast-container"></div>
+
+  <script src="js/main.js"></script>
+  <script>
+    const sections = ['emergency','helplines','legal','ngo','cyber'];
+    function showSection(id) {
+      sections.forEach(s => {
+        document.getElementById(`section-${s}`).style.display = 'none';
+        document.getElementById(`tab-${s}`).classList.remove('active');
+      });
+      document.getElementById(`section-${id}`).style.display = 'block';
+      document.getElementById(`tab-${id}`).classList.add('active');
+      // Re-trigger scroll reveal
+      document.querySelectorAll(`#section-${id} .reveal`).forEach(el => {
+        el.classList.remove('visible');
+        setTimeout(()=> el.classList.add('visible'), 50);
+      });
+    }
+    window.showSection = showSection;
+  </script>
+</body>
+</html>

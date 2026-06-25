@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Report Incident — Anonymously report harassment, stalking, or unsafe locations. Reports are securely stored in the cloud.">
+  <title>Report Incident — SafeGuard</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/animations.css">
+
+  <style>
+    main { position:relative; z-index:1; }
+    .page-header { padding:120px 0 60px; }
+    .page-header h1 { font-family:'Outfit',sans-serif; font-size:clamp(2.2rem,5vw,3.2rem); font-weight:900; margin:1rem 0; }
+    .page-header p { color:hsl(240,10%,60%); font-size:1rem; line-height:1.7; max-width:600px; }
+
+    .report-layout {
+      display: grid;
+      grid-template-columns: 1fr 360px;
+      gap: 2rem;
+      padding-bottom: 5rem;
+    }
+
+    /* FORM CARD */
+    .form-card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 24px;
+      padding: 2.5rem;
+    }
+    .form-card h2 {
+      font-family:'Outfit',sans-serif;
+      font-size:1.4rem;
+      font-weight:800;
+      margin-bottom:0.5rem;
+    }
+    .form-card .subtitle { color:hsl(240,10%,55%); font-size:0.9rem; margin-bottom:2rem; }
+
+    .incident-types {
+      display: grid;
+      grid-template-columns: repeat(3,1fr);
+      gap: 0.75rem;
+      margin-bottom:1.5rem;
+    }
+    .incident-type {
+      padding: 0.9rem 0.75rem;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.03);
+      border: 2px solid rgba(255,255,255,0.07);
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s;
+    }
+    .incident-type:hover { border-color:rgba(138,43,226,0.3); background:rgba(138,43,226,0.08); }
+    .incident-type.selected {
+      border-color:rgba(138,43,226,0.5);
+      background:rgba(138,43,226,0.15);
+      box-shadow: 0 0 20px rgba(138,43,226,0.2);
+    }
+    .incident-type i { display:block; font-size:1.5rem; margin-bottom:0.4rem; color:hsl(270,60%,68%); }
+    .incident-type span { font-size:0.78rem; font-weight:600; color:hsl(240,10%,70%); }
+    .incident-type.selected i,
+    .incident-type.selected span { color:hsl(270,60%,80%); }
+
+    /* DATE/TIME ROW */
+    .datetime-row { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+
+    /* ANONYMOUS TOGGLE */
+    .anon-row {
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:1rem 1.25rem;
+      background:rgba(255,255,255,0.03);
+      border:1px solid rgba(255,255,255,0.07);
+      border-radius:14px;
+      margin-bottom:1.5rem;
+    }
+    .anon-label { font-weight:600; font-size:0.9rem; }
+    .anon-sub   { font-size:0.8rem; color:hsl(240,10%,55%); margin-top:2px; }
+    .toggle-switch {
+      width:48px; height:26px;
+      background:rgba(255,255,255,0.1);
+      border-radius:999px;
+      position:relative;
+      cursor:pointer;
+      transition:background 0.3s;
+      flex-shrink:0;
+    }
+    .toggle-switch.on { background:hsl(270,70%,50%); }
+    .toggle-switch::after {
+      content:'';
+      width:20px;height:20px;
+      background:#fff;
+      border-radius:50%;
+      position:absolute;
+      top:3px;left:3px;
+      transition:transform 0.3s;
+      box-shadow:0 2px 6px rgba(0,0,0,0.3);
+    }
+    .toggle-switch.on::after { transform:translateX(22px); }
+
+    /* FILE UPLOAD */
+    .file-upload {
+      border:2px dashed rgba(255,255,255,0.1);
+      border-radius:16px;
+      padding:2rem;
+      text-align:center;
+      cursor:pointer;
+      transition:all 0.25s;
+      position:relative;
+      margin-bottom:1.5rem;
+    }
+    .file-upload:hover { border-color:rgba(138,43,226,0.4); background:rgba(138,43,226,0.05); }
+    .file-upload.drag-over { border-color:hsl(270,70%,55%); background:rgba(138,43,226,0.1); }
+    .file-upload input { position:absolute;inset:0;opacity:0;cursor:pointer; }
+    .file-upload-icon { font-size:2.5rem; color:hsl(240,10%,40%); margin-bottom:0.75rem; }
+    .file-upload p { color:hsl(240,10%,55%); font-size:0.88rem; }
+    .file-upload p strong { color:hsl(270,60%,70%); }
+    .file-list { margin-top:0.75rem;display:flex;flex-wrap:wrap;gap:0.5rem; }
+    .file-chip { display:flex;align-items:center;gap:6px;padding:4px 12px;background:rgba(138,43,226,0.15);border:1px solid rgba(138,43,226,0.25);border-radius:999px;font-size:0.78rem;color:hsl(270,60%,75%); }
+
+    /* MINI MAP */
+    #mini-map { width:100%;height:220px;border-radius:14px;overflow:hidden;margin-bottom:1.5rem;border:1px solid rgba(255,255,255,0.07); }
+
+    .location-auto {
+      display:flex;align-items:center;gap:0.75rem;
+      padding:0.75rem 1rem;
+      background:rgba(34,197,94,0.08);
+      border:1px solid rgba(34,197,94,0.15);
+      border-radius:12px;
+      margin-bottom:1rem;
+      font-size:0.85rem;
+      color:hsl(150,65%,65%);
+    }
+
+    /* SUBMIT BUTTON */
+    .submit-btn {
+      width:100%;
+      padding:1rem;
+      background:linear-gradient(135deg,hsl(270,70%,50%),hsl(340,80%,60%));
+      color:#fff;
+      border-radius:14px;
+      font-size:1rem;
+      font-weight:700;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:0.75rem;
+      cursor:pointer;
+      transition:all 0.3s;
+      border:none;
+      font-family:'Inter',sans-serif;
+    }
+    .submit-btn:hover { transform:translateY(-2px); box-shadow:0 0 40px rgba(138,43,226,0.4); }
+    .submit-btn:active { transform:translateY(0); }
+    .submit-btn:disabled { opacity:0.6;cursor:not-allowed;transform:none; }
+
+    /* SUCCESS STATE */
+    .success-state {
+      display:none;
+      flex-direction:column;
+      align-items:center;
+      text-align:center;
+      padding:3rem 2rem;
+    }
+    .success-state.show { display:flex; animation:scale-in 0.5s cubic-bezier(0.34,1.56,0.64,1) both; }
+    .success-icon {
+      width:90px;height:90px;
+      border-radius:50%;
+      background:linear-gradient(135deg,hsl(150,65%,40%),hsl(150,65%,30%));
+      display:flex;align-items:center;justify-content:center;
+      font-size:2.5rem;color:#fff;
+      margin-bottom:1.5rem;
+      box-shadow:0 0 40px rgba(34,197,94,0.4);
+    }
+    .success-state h3 { font-family:'Outfit',sans-serif;font-size:1.6rem;font-weight:800;margin-bottom:0.75rem; }
+    .success-state p  { color:hsl(240,10%,60%);font-size:0.95rem;line-height:1.7;max-width:320px;margin-bottom:1.5rem; }
+
+    /* SIDEBAR TIPS */
+    .sidebar-tips { position:sticky;top:100px; }
+    .tips-card {
+      background:rgba(255,255,255,0.04);
+      border:1px solid rgba(255,255,255,0.08);
+      border-radius:20px;
+      overflow:hidden;
+      margin-bottom:1.25rem;
+    }
+    .tips-card-header {
+      padding:1.2rem 1.5rem;
+      background:rgba(138,43,226,0.1);
+      border-bottom:1px solid rgba(255,255,255,0.06);
+      font-family:'Outfit',sans-serif;
+      font-weight:700;
+      font-size:0.92rem;
+      color:hsl(270,60%,75%);
+      display:flex;align-items:center;gap:0.75rem;
+    }
+    .tips-card-body { padding:1.25rem 1.5rem; }
+    .tip-row { display:flex;align-items:flex-start;gap:0.75rem;font-size:0.85rem;color:hsl(240,10%,60%);padding:0.5rem 0;border-bottom:1px solid rgba(255,255,255,0.04);line-height:1.5; }
+    .tip-row:last-child { border-bottom:none; }
+    .tip-row i { color:hsl(270,60%,65%);margin-top:2px;flex-shrink:0; }
+
+    .legal-card {
+      background:rgba(239,68,68,0.08);
+      border:1px solid rgba(239,68,68,0.15);
+      border-radius:20px;
+      padding:1.5rem;
+    }
+    .legal-card h4 { font-family:'Outfit',sans-serif;font-weight:700;font-size:0.95rem;color:hsl(0,85%,75%);margin-bottom:1rem; display:flex;align-items:center;gap:0.5rem; }
+    .legal-item { font-size:0.83rem;color:hsl(240,10%,60%);padding:0.5rem 0;border-bottom:1px solid rgba(255,255,255,0.04);line-height:1.5; }
+    .legal-item strong { color:hsl(240,10%,80%); }
+    .legal-item:last-child { border-bottom:none; }
+
+    @media (max-width:960px) {
+      .report-layout { grid-template-columns:1fr; }
+      .sidebar-tips  { position:static; }
+    }
+    @media (max-width:600px) {
+      .incident-types { grid-template-columns:repeat(2,1fr); }
+      .datetime-row   { grid-template-columns:1fr; }
+      .form-card      { padding:1.5rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="glow-bg" aria-hidden="true"><div class="glow-orb orb-1"></div><div class="glow-orb orb-2"></div></div>
+  <div class="page-progress" id="page-progress"></div>
+
+  <nav class="navbar" id="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="logo"><span class="shield-icon"><i class="fa-solid fa-shield-halved"></i></span><span><span class="text-gradient">Safe</span>Guard</span></a>
+      <button class="mobile-toggle" id="mobile-toggle" aria-label="Toggle menu"><i class="fa-solid fa-bars"></i></button>
+      <div class="nav-menu" id="nav-menu">
+        <ul class="nav-list">
+          <li><a href="index.html" class="nav-link">Home</a></li>
+          <li><a href="safe-route.html" class="nav-link">Safe Routes</a></li>
+          <li><a href="cyber-safety.html" class="nav-link">Cyber Safety</a></li>
+          <li><a href="report-incident.html" class="nav-link active">Report</a></li>
+          <li><a href="community-alerts.html" class="nav-link">Alerts</a></li>
+          <li><a href="resources.html" class="nav-link">Resources</a></li>
+        </ul>
+        <a href="index.html" class="nav-sos-btn"><i class="fa-solid fa-bell"></i> SOS</a>
+      </div>
+    </div>
+  </nav>
+
+  <main>
+    <div class="page-header">
+      <div class="container">
+        <span class="section-subtitle">Community Safety</span>
+        <h1>Report an <span class="text-gradient">Incident</span></h1>
+        <p>Report harassment, stalking, or unsafe locations to help protect the community. Your report can be submitted anonymously and is securely stored in the cloud.</p>
+        <div style="margin-top:1.5rem;">
+          <span class="badge badge-success" style="margin-right:0.5rem;"><i class="fa-solid fa-user-shield"></i> Anonymous Option</span>
+          <span class="badge badge-primary"><i class="fa-solid fa-cloud"></i> Securely Stored</span>
+        </div>
+      </div>
+    </div>
+
+    <section style="padding-bottom:5rem;">
+      <div class="container">
+        <div class="report-layout">
+
+          <!-- FORM -->
+          <div class="form-card">
+            <!-- FORM STATE -->
+            <div id="form-state">
+              <h2><i class="fa-solid fa-file-circle-exclamation" style="color:hsl(270,60%,68%);margin-right:0.5rem;"></i>Incident Report</h2>
+              <p class="subtitle">All fields marked with * are required. This report will help community members stay safe.</p>
+
+              <!-- INCIDENT TYPE -->
+              <div style="margin-bottom:1rem;">
+                <label style="display:block;font-size:0.82rem;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:hsl(240,10%,55%);margin-bottom:0.75rem;">Incident Type *</label>
+                <div class="incident-types" id="incident-types">
+                  <div class="incident-type" onclick="selectType('Harassment',this)" data-type="Harassment">
+                    <i class="fa-solid fa-person-harassing"></i><span>Harassment</span>
+                  </div>
+                  <div class="incident-type" onclick="selectType('Stalking',this)" data-type="Stalking">
+                    <i class="fa-solid fa-eye"></i><span>Stalking</span>
+                  </div>
+                  <div class="incident-type" onclick="selectType('Unsafe Location',this)" data-type="Unsafe Location">
+                    <i class="fa-solid fa-triangle-exclamation"></i><span>Unsafe Area</span>
+                  </div>
+                  <div class="incident-type" onclick="selectType('Cyber Harassment',this)" data-type="Cyber Harassment">
+                    <i class="fa-solid fa-laptop-code"></i><span>Cyber Crime</span>
+                  </div>
+                  <div class="incident-type" onclick="selectType('Theft/Robbery',this)" data-type="Theft/Robbery">
+                    <i class="fa-solid fa-hand-holding"></i><span>Theft/Robbery</span>
+                  </div>
+                  <div class="incident-type" onclick="selectType('Other',this)" data-type="Other">
+                    <i class="fa-solid fa-ellipsis"></i><span>Other</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- LOCATION -->
+              <div class="form-group">
+                <label for="location-text">Location / Address *</label>
+                <div style="display:flex;gap:0.5rem;">
+                  <input type="text" id="location-text" placeholder="Enter address or use GPS location" style="flex:1;">
+                  <button type="button" class="locate-btn" onclick="autoFillLocation()" style="flex-shrink:0;padding:0.75rem 1rem;background:rgba(34,197,94,0.15);border:1px solid rgba(34,197,94,0.25);border-radius:12px;color:hsl(150,65%,60%);font-size:0.88rem;font-weight:600;cursor:pointer;transition:all 0.2s;" title="Use my GPS location">
+                    <i class="fa-solid fa-location-crosshairs"></i>
+                  </button>
+                </div>
+                <div class="location-auto" id="location-status" style="margin-top:0.5rem;display:none;"></div>
+              </div>
+
+              <!-- MINI MAP -->
+              <div id="mini-map" role="application" aria-label="Select incident location on map"></div>
+              <p style="font-size:0.78rem;color:hsl(240,10%,45%);margin-bottom:1.5rem;margin-top:-1rem;"><i class="fa-solid fa-hand-pointer" style="margin-right:4px;"></i>Click on the map to pin the exact incident location</p>
+
+              <!-- DATE / TIME / SEVERITY -->
+              <div class="datetime-row">
+                <div class="form-group">
+                  <label for="incident-date">Date *</label>
+                  <input type="date" id="incident-date">
+                </div>
+                <div class="form-group">
+                  <label for="incident-time">Time</label>
+                  <input type="time" id="incident-time">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="severity">Severity Level *</label>
+                <select id="severity">
+                  <option value="">— Select severity —</option>
+                  <option value="high">🔴 High — Immediate threat or violent incident</option>
+                  <option value="medium">🟡 Medium — Threatening behaviour / stalking</option>
+                  <option value="low">🟢 Low — Suspicious activity / unsafe conditions</option>
+                </select>
+              </div>
+
+              <!-- DESCRIPTION -->
+              <div class="form-group">
+                <label for="description">Describe What Happened *</label>
+                <textarea id="description" rows="5" placeholder="Describe the incident in detail. Include descriptions of individuals involved, what occurred, and any other relevant information that could help authorities…"></textarea>
+              </div>
+
+              <!-- ANONYMOUS TOGGLE -->
+              <div class="anon-row">
+                <div>
+                  <div class="anon-label"><i class="fa-solid fa-user-shield" style="color:hsl(270,60%,68%);margin-right:6px;"></i>Submit Anonymously</div>
+                  <div class="anon-sub">Your identity will not be shared with anyone if enabled</div>
+                </div>
+                <div class="toggle-switch on" id="anon-toggle" onclick="toggleAnon()" role="switch" aria-checked="true" tabindex="0"></div>
+              </div>
+
+              <!-- FILE UPLOAD -->
+              <div class="file-upload" id="file-drop-zone">
+                <input type="file" id="evidence-files" multiple accept="image/*,video/*,.pdf" onchange="handleFiles(this.files)" title="Upload evidence files">
+                <div class="file-upload-icon"><i class="fa-solid fa-cloud-arrow-up"></i></div>
+                <p><strong>Upload Evidence</strong> (optional)</p>
+                <p style="font-size:0.78rem;margin-top:4px;">Photos, videos, or PDFs · Max 10MB each</p>
+                <div class="file-list" id="file-list"></div>
+              </div>
+
+              <!-- CONTACT (if not anon) -->
+              <div class="form-group" id="contact-group">
+                <label for="contact-phone">Your Contact Number (optional)</label>
+                <input type="tel" id="contact-phone" placeholder="+91 98765 43210">
+                <span style="font-size:0.78rem;color:hsl(240,10%,45%);margin-top:4px;display:block;">Only used by authorities to follow up on your report</span>
+              </div>
+
+              <button class="submit-btn" id="submit-btn" onclick="submitReport()">
+                <i class="fa-solid fa-paper-plane"></i>
+                Submit Report
+              </button>
+            </div>
+
+            <!-- SUCCESS STATE -->
+            <div class="success-state" id="success-state">
+              <div class="success-icon"><i class="fa-solid fa-check"></i></div>
+              <h3>Report Submitted!</h3>
+              <p>Your incident report has been securely stored. Thank you for helping keep the community safe.</p>
+              <div id="report-id-display" style="font-family:monospace;font-size:0.85rem;color:hsl(240,10%,50%);background:rgba(255,255,255,0.04);padding:0.75rem 1.25rem;border-radius:12px;border:1px solid rgba(255,255,255,0.08);margin-bottom:1.5rem;"></div>
+              <div style="display:flex;gap:1rem;flex-wrap:wrap;justify-content:center;">
+                <button class="btn btn-primary" onclick="resetForm()"><i class="fa-solid fa-plus"></i> Submit Another</button>
+                <a href="community-alerts.html" class="btn btn-secondary"><i class="fa-solid fa-map"></i> View Alert Map</a>
+              </div>
+            </div>
+          </div>
+
+          <!-- SIDEBAR -->
+          <aside class="sidebar-tips">
+            <div class="tips-card">
+              <div class="tips-card-header"><i class="fa-solid fa-lightbulb"></i>Reporting Tips</div>
+              <div class="tips-card-body">
+                <div class="tip-row"><i class="fa-solid fa-check"></i>Be as specific as possible with location and time</div>
+                <div class="tip-row"><i class="fa-solid fa-check"></i>Include descriptions of individuals if applicable</div>
+                <div class="tip-row"><i class="fa-solid fa-check"></i>Attach any photos or screenshots as evidence</div>
+                <div class="tip-row"><i class="fa-solid fa-check"></i>Enable anonymous mode if you fear retaliation</div>
+                <div class="tip-row"><i class="fa-solid fa-check"></i>For immediate danger, call 112 immediately</div>
+              </div>
+            </div>
+
+            <div class="tips-card">
+              <div class="tips-card-header"><i class="fa-solid fa-phone"></i>Emergency Contacts</div>
+              <div class="tips-card-body">
+                <div class="tip-row"><i class="fa-solid fa-phone"></i><div><strong>112</strong> — National Emergency</div></div>
+                <div class="tip-row"><i class="fa-solid fa-venus"></i><div><strong>1091</strong> — Women Helpline</div></div>
+                <div class="tip-row"><i class="fa-solid fa-shield"></i><div><strong>100</strong> — Police</div></div>
+                <div class="tip-row"><i class="fa-solid fa-computer"></i><div><strong>1930</strong> — Cyber Crime</div></div>
+              </div>
+            </div>
+
+            <div class="legal-card">
+              <h4><i class="fa-solid fa-scale-balanced"></i>Legal Protections</h4>
+              <div class="legal-item"><strong>IPC 354</strong> — Outraging modesty of a woman</div>
+              <div class="legal-item"><strong>IPC 354D</strong> — Stalking (up to 3 years)</div>
+              <div class="legal-item"><strong>IPC 509</strong> — Word, gesture, or act intended to insult modesty</div>
+              <div class="legal-item"><strong>IT Act 66E</strong> — Violation of privacy (up to 3 years)</div>
+              <div class="legal-item"><strong>IT Act 67A</strong> — Sexual content online (up to 5 years)</div>
+              <div style="margin-top:1rem;padding-top:0.75rem;border-top:1px solid rgba(255,255,255,0.06);">
+                <a href="resources.html" style="font-size:0.83rem;color:hsl(0,85%,72%);display:inline-flex;align-items:center;gap:6px;text-decoration:none;">
+                  <i class="fa-solid fa-external-link-alt"></i>Full Legal Guide →
+                </a>
+              </div>
+            </div>
+          </aside>
+
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-bottom" style="border-top:none;padding-top:0;">
+        <p style="color:hsl(240,10%,45%);font-size:0.85rem;">© 2026 SafeGuard. All reports are confidential.</p>
+        <a href="index.html" style="color:hsl(270,60%,68%);font-size:0.85rem;"><i class="fa-solid fa-arrow-left" style="margin-right:6px;"></i>Back to Home</a>
+      </div>
+    </div>
+  </footer>
+
+  <div id="toast-container" class="toast-container"></div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/report.js"></script>
+</body>
+</html>

@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Cyber Safety Module — Learn about phishing scams, fake profiles, online harassment, and privacy protection. Take the cyber safety quiz.">
+  <title>Cyber Safety Module — SafeGuard</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/animations.css">
+
+  <style>
+    main { position: relative; z-index: 1; }
+
+    /* PAGE HEADER */
+    .page-header { padding: 120px 0 60px; }
+    .page-header h1 { font-family:'Outfit',sans-serif; font-size:clamp(2.2rem,5vw,3.2rem); font-weight:900; margin:1rem 0; }
+    .page-header p  { color:hsl(240,10%,60%); font-size:1rem; line-height:1.7; max-width:680px; }
+
+    /* MODULES GRID */
+    .modules-grid {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 2rem;
+      padding-bottom: 5rem;
+    }
+
+    /* MODULE NAV SIDEBAR */
+    .module-nav {
+      position: sticky;
+      top: 100px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .module-nav-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      padding: 1rem 1.25rem;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.07);
+      color: hsl(240,10%,60%);
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.25s;
+      text-align: left;
+    }
+    .module-nav-btn:hover { background:rgba(138,43,226,0.1); border-color:rgba(138,43,226,0.2); color:hsl(240,10%,85%); }
+    .module-nav-btn.active {
+      background: rgba(138,43,226,0.18);
+      border-color: rgba(138,43,226,0.4);
+      color: hsl(270,60%,78%);
+      box-shadow: 0 0 20px rgba(138,43,226,0.15);
+    }
+    .module-nav-icon {
+      width: 36px; height: 36px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+    .icon-red    { background:rgba(239,68,68,0.2);   color:#f87171; }
+    .icon-blue   { background:rgba(59,130,246,0.2);  color:#60a5fa; }
+    .icon-yellow { background:rgba(245,158,11,0.2);  color:#fbbf24; }
+    .icon-green  { background:rgba(34,197,94,0.2);   color:#4ade80; }
+    .icon-purple { background:rgba(168,85,247,0.2);  color:#c084fc; }
+
+    /* MODULE CONTENT */
+    .module-content { min-height: 600px; }
+    .module-pane { display: none; animation: fade-in 0.4s ease; }
+    .module-pane.active { display: block; }
+
+    .module-hero {
+      padding: 2.5rem;
+      border-radius: 20px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      margin-bottom: 2rem;
+      display: flex;
+      gap: 2rem;
+      align-items: flex-start;
+    }
+    .module-hero-icon {
+      width: 72px; height: 72px;
+      border-radius: 20px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2rem;
+      flex-shrink: 0;
+    }
+    .module-hero h2 { font-family:'Outfit',sans-serif; font-size:1.7rem; font-weight:800; margin-bottom:0.5rem; }
+    .module-hero p  { color:hsl(240,10%,60%); line-height:1.7; font-size:0.95rem; }
+
+    /* RED FLAG / SAFE CARD */
+    .info-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem; }
+    .info-card {
+      padding: 1.75rem;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+    .info-card-title {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-family:'Outfit',sans-serif;
+      font-weight: 700;
+      font-size: 1rem;
+      margin-bottom: 1rem;
+    }
+    .info-card.danger  { border-color: rgba(239,68,68,0.2); }
+    .info-card.success { border-color: rgba(34,197,94,0.2); }
+
+    /* EXAMPLE CARD */
+    .example-card {
+      padding: 1.5rem;
+      border-radius: 16px;
+      background: rgba(239,68,68,0.06);
+      border: 1px solid rgba(239,68,68,0.15);
+      margin-bottom: 2rem;
+      position: relative;
+    }
+    .example-card::before {
+      content: 'REAL EXAMPLE';
+      position: absolute;
+      top: 1rem; right: 1rem;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      color: rgba(248,113,113,0.7);
+      background: rgba(239,68,68,0.1);
+      padding: 3px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(239,68,68,0.2);
+    }
+    .example-card h4 { font-family:'Outfit',sans-serif; font-weight:700; margin-bottom:0.75rem; color:hsl(0,85%,78%); }
+    .example-card p  { font-size:0.9rem; color:hsl(240,10%,65%); line-height:1.7; }
+
+    /* REPORTING LINKS */
+    .report-links {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px,1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    .report-link-card {
+      padding: 1.25rem;
+      border-radius: 14px;
+      background: rgba(138,43,226,0.1);
+      border: 1px solid rgba(138,43,226,0.2);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      transition: all 0.2s;
+    }
+    .report-link-card:hover { background:rgba(138,43,226,0.2); transform:translateY(-2px); }
+    .report-link-card .rlink-icon { font-size:1.5rem; color:hsl(270,60%,70%); }
+    .report-link-card .rlink-name { font-weight:700; font-size:0.9rem; }
+    .report-link-card .rlink-url  { font-size:0.78rem; color:hsl(240,10%,55%); margin-top:2px; }
+
+    /* QUIZ */
+    .quiz-container {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 20px;
+      padding: 2rem;
+    }
+    .quiz-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 2rem;
+    }
+    .quiz-header h3 { font-family:'Outfit',sans-serif; font-size:1.3rem; font-weight:800; }
+    .quiz-progress-bar {
+      width: 100%;
+      height: 6px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 999px;
+      margin-bottom: 2rem;
+      overflow: hidden;
+    }
+    .quiz-progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, hsl(270,70%,55%), hsl(340,80%,65%));
+      border-radius: 999px;
+      transition: width 0.4s ease;
+    }
+    .quiz-question {
+      font-family:'Outfit',sans-serif;
+      font-size:1.05rem;
+      font-weight:700;
+      margin-bottom:1.5rem;
+      line-height: 1.4;
+    }
+    .quiz-options { display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1.5rem; }
+    .quiz-option {
+      padding: 0.9rem 1.25rem;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      cursor: pointer;
+      font-size: 0.92rem;
+      font-weight: 500;
+      transition: all 0.2s;
+      text-align: left;
+    }
+    .quiz-option:hover:not(:disabled) { background:rgba(138,43,226,0.12); border-color:rgba(138,43,226,0.3); }
+    .quiz-option.correct  { background:rgba(34,197,94,0.15);  border-color:rgba(34,197,94,0.4);  color:#4ade80; }
+    .quiz-option.wrong    { background:rgba(239,68,68,0.15);  border-color:rgba(239,68,68,0.4);  color:#f87171; }
+    .quiz-option.selected { background:rgba(138,43,226,0.15); border-color:rgba(138,43,226,0.4); }
+    .quiz-option:disabled { cursor:default; }
+
+    .quiz-feedback {
+      padding: 1rem 1.25rem;
+      border-radius: 12px;
+      font-size: 0.9rem;
+      margin-bottom: 1.5rem;
+      display: none;
+    }
+    .quiz-feedback.show { display: block; }
+    .quiz-feedback.correct { background:rgba(34,197,94,0.1);  border:1px solid rgba(34,197,94,0.25);  color:#4ade80; }
+    .quiz-feedback.wrong   { background:rgba(239,68,68,0.1);  border:1px solid rgba(239,68,68,0.25);  color:#f87171; }
+
+    .quiz-score-card {
+      text-align: center;
+      padding: 3rem 2rem;
+      display: none;
+    }
+    .quiz-score-card.show { display: block; animation: scale-in 0.5s cubic-bezier(0.34,1.56,0.64,1) both; }
+    .score-circle {
+      width: 120px; height: 120px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, hsl(270,70%,50%), hsl(340,80%,60%));
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      margin: 0 auto 1.5rem;
+      box-shadow: 0 0 40px rgba(138,43,226,0.4);
+    }
+    .score-num { font-family:'Outfit',sans-serif; font-size:2.5rem; font-weight:900; color:#fff; line-height:1; }
+    .score-total { font-size:0.85rem; color:rgba(255,255,255,0.7); }
+    .quiz-score-card h3 { font-family:'Outfit',sans-serif; font-size:1.6rem; font-weight:800; margin-bottom:0.75rem; }
+    .quiz-score-card p  { color:hsl(240,10%,60%); font-size:0.95rem; margin-bottom:2rem; }
+
+    @media (max-width: 900px) {
+      .modules-grid { grid-template-columns: 1fr; }
+      .module-nav { position:static; flex-direction:row; flex-wrap:wrap; }
+      .module-nav-btn { flex: 1; min-width: 140px; }
+    }
+    @media (max-width: 600px) {
+      .info-row { grid-template-columns: 1fr; }
+      .module-hero { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <div class="glow-bg" aria-hidden="true">
+    <div class="glow-orb orb-1"></div>
+    <div class="glow-orb orb-2"></div>
+  </div>
+  <div class="page-progress" id="page-progress"></div>
+
+  <nav class="navbar" id="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="logo"><span class="shield-icon"><i class="fa-solid fa-shield-halved"></i></span><span><span class="text-gradient">Safe</span>Guard</span></a>
+      <button class="mobile-toggle" id="mobile-toggle" aria-label="Toggle menu"><i class="fa-solid fa-bars"></i></button>
+      <div class="nav-menu" id="nav-menu">
+        <ul class="nav-list">
+          <li><a href="index.html" class="nav-link">Home</a></li>
+          <li><a href="safe-route.html" class="nav-link">Safe Routes</a></li>
+          <li><a href="cyber-safety.html" class="nav-link active">Cyber Safety</a></li>
+          <li><a href="report-incident.html" class="nav-link">Report</a></li>
+          <li><a href="community-alerts.html" class="nav-link">Alerts</a></li>
+          <li><a href="resources.html" class="nav-link">Resources</a></li>
+        </ul>
+        <a href="index.html" class="nav-sos-btn"><i class="fa-solid fa-bell"></i> SOS</a>
+      </div>
+    </div>
+  </nav>
+
+  <main>
+    <div class="page-header">
+      <div class="container">
+        <span class="section-subtitle">Digital Safety</span>
+        <h1>Cyber Safety <span class="text-gradient">Education Module</span></h1>
+        <p>Understand the threats lurking online and protect yourself. Learn to identify phishing scams, fake profiles, online harassment, and safeguard your digital privacy.</p>
+        <div style="margin-top:1.5rem;">
+          <span class="badge badge-primary" style="margin-right:0.5rem;"><i class="fa-solid fa-graduation-cap"></i> 4 Modules</span>
+          <span class="badge badge-warning"><i class="fa-solid fa-question-circle"></i> Interactive Quiz</span>
+        </div>
+      </div>
+    </div>
+
+    <section style="padding-bottom:5rem;">
+      <div class="container">
+        <div class="modules-grid">
+
+          <!-- MODULE NAV -->
+          <nav class="module-nav" aria-label="Cyber safety modules">
+            <button class="module-nav-btn active" onclick="showModule('phishing')" id="nav-phishing">
+              <span class="module-nav-icon icon-red"><i class="fa-solid fa-fish-fins"></i></span>
+              Phishing Scams
+            </button>
+            <button class="module-nav-btn" onclick="showModule('fake')" id="nav-fake">
+              <span class="module-nav-icon icon-blue"><i class="fa-solid fa-user-secret"></i></span>
+              Fake Profiles
+            </button>
+            <button class="module-nav-btn" onclick="showModule('harassment')" id="nav-harassment">
+              <span class="module-nav-icon icon-yellow"><i class="fa-solid fa-exclamation-triangle"></i></span>
+              Online Harassment
+            </button>
+            <button class="module-nav-btn" onclick="showModule('privacy')" id="nav-privacy">
+              <span class="module-nav-icon icon-green"><i class="fa-solid fa-lock"></i></span>
+              Privacy Protection
+            </button>
+            <button class="module-nav-btn" onclick="showModule('quiz')" id="nav-quiz">
+              <span class="module-nav-icon icon-purple"><i class="fa-solid fa-circle-question"></i></span>
+              Take the Quiz
+            </button>
+
+            <!-- Quick Links -->
+            <div style="margin-top:1.5rem;padding:1.25rem;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.15);border-radius:14px;">
+              <div style="font-size:0.82rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:hsl(0,85%,72%);margin-bottom:0.75rem;">
+                <i class="fa-solid fa-exclamation-circle" style="margin-right:6px;"></i>Report Cybercrime
+              </div>
+              <a href="https://cybercrime.gov.in" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:8px;color:hsl(240,10%,70%);font-size:0.85rem;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.05);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='hsl(0,85%,72%)'" onmouseout="this.style.color='hsl(240,10%,70%)'">
+                <i class="fa-solid fa-external-link-alt"></i> cybercrime.gov.in
+              </a>
+              <a href="https://cert-in.org.in" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:8px;color:hsl(240,10%,70%);font-size:0.85rem;padding:6px 0;text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='hsl(0,85%,72%)'" onmouseout="this.style.color='hsl(240,10%,70%)'">
+                <i class="fa-solid fa-external-link-alt"></i> CERT-In (cert-in.org.in)
+              </a>
+            </div>
+          </nav>
+
+          <!-- MODULE CONTENT -->
+          <div class="module-content" role="main">
+
+            <!-- PHISHING MODULE -->
+            <div class="module-pane active" id="pane-phishing">
+              <div class="module-hero">
+                <div class="module-hero-icon icon-red" style="background:rgba(239,68,68,0.15);"><i class="fa-solid fa-fish-fins" style="color:#f87171;"></i></div>
+                <div>
+                  <h2>Phishing Scams</h2>
+                  <p>Phishing is a cybercrime where attackers impersonate legitimate organizations — banks, government agencies, or social media platforms — to steal sensitive information like passwords, OTPs, and credit card numbers through deceptive emails, SMS, or fake websites.</p>
+                </div>
+              </div>
+
+              <div class="info-row">
+                <div class="info-card danger">
+                  <div class="info-card-title"><i class="fa-solid fa-triangle-exclamation" style="color:#ef4444;"></i> Red Flags</div>
+                  <ul class="icon-list danger">
+                    <li><i class="fa-solid fa-xmark-circle"></i> Urgent messages demanding immediate action</li>
+                    <li><i class="fa-solid fa-xmark-circle"></i> Sender email doesn't match the official domain</li>
+                    <li><i class="fa-solid fa-xmark-circle"></i> Suspicious links (hover to see the real URL)</li>
+                    <li><i class="fa-solid fa-xmark-circle"></i> Requests for OTP, password, or card details</li>
+                    <li><i class="fa-solid fa-xmark-circle"></i> Poor grammar and spelling in messages</li>
+                    <li><i class="fa-solid fa-xmark-circle"></i> Too-good-to-be-true offers or lottery wins</li>
+                  </ul>
+                </div>
+                <div class="info-card success">
+                  <div class="info-card-title"><i class="fa-solid fa-shield-check" style="color:#22c55e;"></i> How to Stay Safe</div>
+                  <ul class="icon-list">
+                    <li><i class="fa-solid fa-check-circle"></i> Never share OTP, PIN, or passwords — even with "bank officials"</li>
+                    <li><i class="fa-solid fa-check-circle"></i> Verify the sender email carefully before clicking</li>
+                    <li><i class="fa-solid fa-check-circle"></i> Access websites by typing the URL directly</li>
+                    <li><i class="fa-solid fa-check-circle"></i> Enable two-factor authentication (2FA)</li>
+                    <li><i class="fa-solid fa-check-circle"></i> Use a password manager for strong, unique passwords</li>
+                    <li><i class="fa-solid fa-check-circle"></i> Report phishing emails to report@phishing.gov.in</li>
+                  </ul>
+                </div>
+              </div>
+
+              <div class="example-card">
+                <h4><i class="fa-solid fa-envelope"></i> "Urgent: Your SBI account has been blocked"</h4>
+                <p>You receive an email from <strong style="color:#f87171;">sbi-alert@sbi-update.xyz</strong> (not from <em>sbi.co.in</em>) saying your account will be blocked unless you verify your details at a link. The link leads to a fake website that steals your net banking credentials and OTP.</p>
+              </div>
+
+              <h3 style="font-family:'Outfit',sans-serif;font-weight:700;margin-bottom:1rem;">Where to Report</h3>
+              <div class="report-links">
+                <a href="https://cybercrime.gov.in" target="_blank" rel="noopener" class="report-link-card">
+                  <i class="fa-solid fa-gavel rlink-icon"></i>
+                  <div><div class="rlink-name">National Cybercrime Portal</div><div class="rlink-url">cybercrime.gov.in</div></div>
+                </a>
+                <a href="tel:1930" class="report-link-card">
+                  <i class="fa-solid fa-phone rlink-icon"></i>
+                  <div><div class="rlink-name">Cyber Crime Helpline</div><div class="rlink-url">Call 1930</div></div>
+                </a>
+                <a href="mailto:report@phishing.gov.in" class="report-link-card">
+                  <i class="fa-solid fa-envelope rlink-icon"></i>
+                  <div><div class="rlink-name">Report Phishing Email</div><div class="rlink-url">report@phishing.gov.in</div></div>
+                </a>
+              </div>
+            </div>
+
+            <!-- FAKE PROFILES MODULE -->
+            <div class="module-pane" id="pane-fake">
+              <div class="module-hero">
+                <div class="module-hero-icon" style="background:rgba(59,130,246,0.15);"><i class="fa-solid fa-user-secret" style="color:#60a5fa;"></i></div>
+                <div>
+                  <h2>Fake Profiles</h2>
+                  <p>Fake social media profiles are created to deceive, harass, impersonate, or scam women. They are often used in romance scams, blackmail, or to collect personal information for malicious purposes.</p>
+                </div>
+              </div>
+
+              <div class="info-row">
+                <div class="info-card danger">
+                  <div class="info-card-title"><i class="fa-solid fa-triangle-exclamation" style="color:#ef4444;"></i> Warning Signs</div>
+                  <ul class="icon-list danger">
+                    <li><i class="fa-solid fa-xmark-circle"></i> Account created very recently with few posts</li>
+                    <li><i class="fa-solid fa-xmark-circle"></i> Stock photos used as profile picture</li>
+                    <li><i class="fa-solid fa-xmark-circle"></i> Rushing to build emotional intimacy quickly</li>
+                    <li><i class="fa-solid fa-xmark-circle"></i> Claims to be in the military, doctor abroad</li>
+                    <li><i class="fa-solid fa-xmark-circle"></i> Asks to move conversation to WhatsApp/Telegram</li>
+                    <li><i class="fa-solid fa-xmark-circle"></i> Eventually asks for money or gift cards</li>
+                  </ul>
+                </div>
+                <div class="info-card success">
+                  <div class="info-card-title"><i class="fa-solid fa-shield-check" style="color:#22c55e;"></i> How to Stay Safe</div>
+                  <ul class="icon-list">
+                    <li><i class="fa-solid fa-check-circle"></i> Reverse-search profile photos using Google Images</li>
+                    <li><i class="fa-solid fa-check-circle"></i> Verify identity through video call before trusting</li>
+                    <li><i class="fa-solid fa-check-circle"></i> Never send money to someone you've only met online</li>
+                    <li><i class="fa-solid fa-check-circle"></i> Keep your own profile private and limit personal info</li>
+                    <li><i class="fa-solid fa-check-circle"></i> Report and block suspicious accounts immediately</li>
+                    <li><i class="fa-solid fa-check-circle"></i> Inform friends/family if you receive suspicious requests</li>
+                  </ul>
+                </div>
+              </div>
+
+              <div class="example-card">
+                <h4><i class="fa-solid fa-user-tie"></i> The "Army Officer" Romance Scam</h4>
+                <p>A woman receives a friend request from an attractive man claiming to be a military officer deployed abroad. After weeks of emotional conversations, he claims to need money for "emergency medical treatment" or to "fly home." The photos are stolen from a real person's account.</p>
+              </div>
+
+              <div class="alert-box alert-info" style="margin-bottom:1.5rem;">
+                <i class="fa-solid fa-circle-info"></i>
+                <div><strong>Did you know?</strong> The IT Act Section 66C (Identity Theft) and Section 66D (Cheating by Impersonation) make creating fake profiles with someone else's identity a punishable offence with up to 3 years imprisonment.</div>
+              </div>
+            </div>
+
+            <!-- HARASSMENT MODULE -->
+            <div class="module-pane" id="pane-harassment">
+              <div class="module-hero">
+                <div class="module-hero-icon" style="background:rgba(245,158,11,0.15);"><i class="fa-solid fa-exclamation-triangle" style="color:#fbbf24;"></i></div>
+                <div>
+                  <h2>Online Harassment</h2>
+                  <p>Online harassment includes cyberstalking, trolling, doxxing, revenge pornography, and sending threatening or abusive messages. Women face disproportionately higher rates of targeted online abuse.</p>
+                </div>
+              </div>
+
+              <div class="info-row">
+                <div class="info-card danger">
+                  <div class="info-card-title"><i class="fa-solid fa-triangle-exclamation" style="color:#ef4444;"></i> Types of Online Harassment</div>
+                  <ul class="icon-list danger">
+                    <li><i class="fa-solid fa-xmark-circle"></i> <strong>Cyberstalking:</strong> Persistent unwanted contact online</li>
+                    <li><i class="fa-solid fa-xmark-circle"></i> <strong>Trolling:</strong> Deliberate offensive or provocative messages</li>
+                    <li><i class="fa-solid fa-xmark-circle"></i> <strong>Doxxing:</strong> Publicly revealing private information</li>
+                    <li><i class="fa-solid fa-xmark-circle"></i> <strong>Morphing:</strong> Editing intimate photos without consent</li>
+                    <li><i class="fa-solid fa-xmark-circle"></i> <strong>Revenge Porn:</strong> Non-consensual intimate image sharing</li>
+                    <li><i class="fa-solid fa-xmark-circle"></i> <strong>Impersonation:</strong> Creating fake accounts in your name</li>
+                  </ul>
+                </div>
+                <div class="info-card success">
+                  <div class="info-card-title"><i class="fa-solid fa-shield-check" style="color:#22c55e;"></i> What To Do</div>
+                  <ul class="icon-list">
+                    <li><i class="fa-solid fa-check-circle"></i> Document everything — screenshots with timestamps</li>
+                    <li><i class="fa-solid fa-check-circle"></i> Do NOT engage with harassers — block immediately</li>
+                    <li><i class="fa-solid fa-check-circle"></i> Report to the platform (Twitter, Instagram, etc.)</li>
+                    <li><i class="fa-solid fa-check-circle"></i> File a complaint at cybercrime.gov.in or call 1930</li>
+                    <li><i class="fa-solid fa-check-circle"></i> Tell a trusted person — you are not alone</li>
+                    <li><i class="fa-solid fa-check-circle"></i> Consult a lawyer for IPC Section 67A cases</li>
+                  </ul>
+                </div>
+              </div>
+
+              <h3 style="font-family:'Outfit',sans-serif;font-weight:700;margin-bottom:1rem;">Legal Provisions</h3>
+              <div style="display:flex;flex-direction:column;gap:0.75rem;margin-bottom:2rem;">
+                <div class="alert-box alert-info"><i class="fa-solid fa-scale-balanced"></i><div><strong>IT Act Section 66A</strong> — Sending offensive electronic messages</div></div>
+                <div class="alert-box alert-danger"><i class="fa-solid fa-scale-balanced"></i><div><strong>IT Act Section 67A</strong> — Publishing/transmitting sexually explicit content: Up to 5 years & ₹10 lakh fine</div></div>
+                <div class="alert-box alert-info"><i class="fa-solid fa-scale-balanced"></i><div><strong>IPC Section 354D</strong> — Cyberstalking: Up to 3 years imprisonment</div></div>
+              </div>
+            </div>
+
+            <!-- PRIVACY MODULE -->
+            <div class="module-pane" id="pane-privacy">
+              <div class="module-hero">
+                <div class="module-hero-icon" style="background:rgba(34,197,94,0.15);"><i class="fa-solid fa-lock" style="color:#4ade80;"></i></div>
+                <div>
+                  <h2>Privacy Protection</h2>
+                  <p>Your digital privacy is your right. Learn practical steps to control your online footprint, secure your accounts, and protect your personal data from being misused.</p>
+                </div>
+              </div>
+
+              <div class="info-row">
+                <div class="info-card" style="border-color:rgba(34,197,94,0.2);">
+                  <div class="info-card-title"><i class="fa-solid fa-mobile-screen" style="color:#4ade80;"></i> Device Security</div>
+                  <ul class="icon-list">
+                    <li><i class="fa-solid fa-check-circle"></i> Use strong biometric/PIN lock on all devices</li>
+                    <li><i class="fa-solid fa-check-circle"></i> Keep your OS and apps updated</li>
+                    <li><i class="fa-solid fa-check-circle"></i> Install apps only from official stores</li>
+                    <li><i class="fa-solid fa-check-circle"></i> Review app permissions regularly (camera, mic, location)</li>
+                    <li><i class="fa-solid fa-check-circle"></i> Use a VPN on public Wi-Fi networks</li>
+                  </ul>
+                </div>
+                <div class="info-card" style="border-color:rgba(34,197,94,0.2);">
+                  <div class="info-card-title"><i class="fa-solid fa-share-nodes" style="color:#4ade80;"></i> Social Media Privacy</div>
+                  <ul class="icon-list">
+                    <li><i class="fa-solid fa-check-circle"></i> Set all profiles to Private</li>
+                    <li><i class="fa-solid fa-check-circle"></i> Don't share real-time location in posts</li>
+                    <li><i class="fa-solid fa-check-circle"></i> Disable geotagging on photos</li>
+                    <li><i class="fa-solid fa-check-circle"></i> Limit who can see your contact info</li>
+                    <li><i class="fa-solid fa-check-circle"></i> Regularly review connected apps and revoke unused access</li>
+                  </ul>
+                </div>
+              </div>
+
+              <div class="info-row">
+                <div class="info-card" style="border-color:rgba(34,197,94,0.2);">
+                  <div class="info-card-title"><i class="fa-solid fa-key" style="color:#4ade80;"></i> Account Security</div>
+                  <ul class="icon-list">
+                    <li><i class="fa-solid fa-check-circle"></i> Enable 2FA on email, banking, and social apps</li>
+                    <li><i class="fa-solid fa-check-circle"></i> Use a password manager (Bitwarden, 1Password)</li>
+                    <li><i class="fa-solid fa-check-circle"></i> Never reuse passwords across sites</li>
+                    <li><i class="fa-solid fa-check-circle"></i> Check haveibeenpwned.com for leaked accounts</li>
+                  </ul>
+                </div>
+                <div class="info-card" style="border-color:rgba(34,197,94,0.2);">
+                  <div class="info-card-title"><i class="fa-solid fa-envelope-open-text" style="color:#4ade80;"></i> Email & Communication</div>
+                  <ul class="icon-list">
+                    <li><i class="fa-solid fa-check-circle"></i> Use end-to-end encrypted messaging (Signal, WhatsApp)</li>
+                    <li><i class="fa-solid fa-check-circle"></i> Use ProtonMail for sensitive communications</li>
+                    <li><i class="fa-solid fa-check-circle"></i> Be cautious sharing personal email publicly</li>
+                    <li><i class="fa-solid fa-check-circle"></i> Don't open email attachments from unknown senders</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <!-- QUIZ MODULE -->
+            <div class="module-pane" id="pane-quiz">
+              <div class="quiz-container">
+                <div class="quiz-header">
+                  <h3><i class="fa-solid fa-brain" style="color:#c084fc;margin-right:0.5rem;"></i> Cyber Safety Quiz</h3>
+                  <span id="quiz-counter" style="font-size:0.88rem;color:hsl(240,10%,55%);">Question 1 of 8</span>
+                </div>
+
+                <div id="quiz-active">
+                  <div class="quiz-progress-bar">
+                    <div class="quiz-progress-fill" id="quiz-progress" style="width:12.5%;"></div>
+                  </div>
+                  <div class="quiz-question" id="quiz-question"></div>
+                  <div class="quiz-options" id="quiz-options"></div>
+                  <div class="quiz-feedback" id="quiz-feedback"></div>
+                  <button class="btn btn-primary" id="quiz-next" style="display:none;" onclick="nextQuestion()">
+                    Next Question <i class="fa-solid fa-arrow-right"></i>
+                  </button>
+                </div>
+
+                <div class="quiz-score-card" id="quiz-result">
+                  <div class="score-circle">
+                    <span class="score-num" id="final-score">0</span>
+                    <span class="score-total" id="final-total">/8</span>
+                  </div>
+                  <h3 id="result-title">Great Job!</h3>
+                  <p id="result-msg">Keep learning and sharing cyber safety awareness with others.</p>
+                  <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;">
+                    <button class="btn btn-primary" onclick="restartQuiz()"><i class="fa-solid fa-rotate-right"></i> Try Again</button>
+                    <a href="resources.html" class="btn btn-secondary"><i class="fa-solid fa-book-open"></i> View Resources</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div><!-- end module-content -->
+        </div><!-- end modules-grid -->
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-bottom" style="border-top:none;padding-top:0;">
+        <p style="color:hsl(240,10%,45%);font-size:0.85rem;">© 2026 SafeGuard. Stay cyber-safe.</p>
+        <a href="index.html" style="color:hsl(270,60%,68%);font-size:0.85rem;"><i class="fa-solid fa-arrow-left" style="margin-right:6px;"></i>Back to Home</a>
+      </div>
+    </div>
+  </footer>
+
+  <div id="toast-container" class="toast-container"></div>
+
+  <script src="js/main.js"></script>
+  <script>
+    // MODULE SWITCHING
+    const modules = ['phishing','fake','harassment','privacy','quiz'];
+    function showModule(id) {
+      modules.forEach(m => {
+        document.getElementById(`pane-${m}`)?.classList.remove('active');
+        document.getElementById(`nav-${m}`)?.classList.remove('active');
+      });
+      document.getElementById(`pane-${id}`)?.classList.add('active');
+      document.getElementById(`nav-${id}`)?.classList.add('active');
+      if (id === 'quiz' && !quizStarted) initQuiz();
+    }
+
+    // ===== QUIZ ENGINE =====
+    const QUESTIONS = [
+      { q: "You receive an email from 'support@sbi-onlinebanking.net' asking for your net banking password. What should you do?", opts:["Share your password quickly to restore access","Check if the sender domain is officially sbi.co.in — this is phishing","Call the number in the email","Click the link to verify your account"], ans:1, exp:"Official SBI emails come from @sbi.co.in — never @sbi-onlinebanking.net. This is a phishing attack." },
+      { q: "A new friend on Instagram has a profile created 1 month ago, uses a model's photo, and quickly asks you to move to WhatsApp. What's most likely?", opts:["They're just shy and prefer WhatsApp","This is a genuine friendship","These are classic signs of a fake/catfishing profile","They work for Instagram support"], ans:2, exp:"New accounts, stock photos, and pressure to move platforms are major red flags of fake profiles." },
+      { q: "Someone is sending you threatening messages online. What should be your FIRST step?", opts:["Reply and tell them to stop","Delete the messages","Screenshot everything, then block and report the account","Ignore — they'll stop eventually"], ans:2, exp:"Documentation (screenshots with timestamps) is crucial evidence before blocking, as it may be needed for legal proceedings." },
+      { q: "Which of these is the correct URL for India's National Cybercrime Reporting Portal?", opts:["www.cyberpolice.gov.in","www.cybercrime.gov.in","www.ncib.gov.in","www.cybersafety.india.gov"], ans:1, exp:"The official portal is cybercrime.gov.in. Always verify government website URLs carefully." },
+      { q: "What does Two-Factor Authentication (2FA) protect you from?", opts:["Spam emails","Account takeover even if your password is stolen","Fake profiles","Slow internet"], ans:1, exp:"2FA adds a second verification step, so even if your password is compromised, attackers still can't log in." },
+      { q: "An online 'friend' you've never met in person asks you to send money for a medical emergency abroad. What do you do?", opts:["Send money — it's an emergency","Request a video call first to verify their identity","Ignore it","Ask them for their bank details"], ans:1, exp:"Always verify identity via video call. Romance scammers frequently fabricate medical emergencies. Never send money to someone you haven't met." },
+      { q: "You see photos of yourself on a fake profile. Under the IT Act, creating such an account is punishable under:", opts:["Section 354 IPC","Section 66C and 66D IT Act","Section 498A IPC","No law covers this"], ans:1, exp:"IT Act Section 66C (Identity Theft) and 66D (Cheating by Impersonation) directly cover creating fake profiles with someone else's identity." },
+      { q: "Which app provides end-to-end encrypted calling AND messaging for maximum privacy?", opts:["Regular SMS","WhatsApp or Signal","Standard phone calls","Gmail"], ans:1, exp:"Signal provides the strongest end-to-end encryption. WhatsApp also uses the Signal Protocol for encryption." },
+    ];
+
+    let currentQ = 0, score = 0, answered = false, quizStarted = false;
+
+    function initQuiz() {
+      quizStarted = true;
+      currentQ = 0; score = 0; answered = false;
+      document.getElementById('quiz-active').style.display = '';
+      document.getElementById('quiz-result').classList.remove('show');
+      renderQuestion();
+    }
+
+    function renderQuestion() {
+      answered = false;
+      const q = QUESTIONS[currentQ];
+      document.getElementById('quiz-question').textContent = `Q${currentQ+1}. ${q.q}`;
+      document.getElementById('quiz-counter').textContent = `Question ${currentQ+1} of ${QUESTIONS.length}`;
+      document.getElementById('quiz-progress').style.width = `${((currentQ+1)/QUESTIONS.length)*100}%`;
+
+      const optionsEl = document.getElementById('quiz-options');
+      optionsEl.innerHTML = q.opts.map((opt, i) =>
+        `<button class="quiz-option" onclick="selectOption(${i})">${String.fromCharCode(65+i)}. ${opt}</button>`
+      ).join('');
+
+      document.getElementById('quiz-feedback').classList.remove('show','correct','wrong');
+      document.getElementById('quiz-next').style.display = 'none';
+    }
+
+    function selectOption(idx) {
+      if (answered) return;
+      answered = true;
+      const q = QUESTIONS[currentQ];
+      const opts = document.querySelectorAll('.quiz-option');
+
+      opts.forEach(o => o.disabled = true);
+      opts[idx].classList.add(idx === q.ans ? 'correct' : 'wrong');
+      if (idx !== q.ans) opts[q.ans].classList.add('correct');
+
+      const fb = document.getElementById('quiz-feedback');
+      if (idx === q.ans) {
+        score++;
+        fb.className = 'quiz-feedback show correct';
+        fb.innerHTML = `<i class="fa-solid fa-check-circle"></i> <strong>Correct!</strong> ${q.exp}`;
+      } else {
+        fb.className = 'quiz-feedback show wrong';
+        fb.innerHTML = `<i class="fa-solid fa-xmark-circle"></i> <strong>Incorrect.</strong> ${q.exp}`;
+      }
+
+      document.getElementById('quiz-next').style.display = 'flex';
+    }
+
+    function nextQuestion() {
+      currentQ++;
+      if (currentQ >= QUESTIONS.length) {
+        showResult();
+      } else {
+        renderQuestion();
+      }
+    }
+
+    function showResult() {
+      document.getElementById('quiz-active').style.display = 'none';
+      const resultEl = document.getElementById('quiz-result');
+      resultEl.classList.add('show');
+      document.getElementById('final-score').textContent = score;
+      document.getElementById('final-total').textContent = `/${QUESTIONS.length}`;
+
+      const pct = score / QUESTIONS.length;
+      let title, msg;
+      if (pct >= 0.87)    { title = '🏆 Cyber Safety Champion!'; msg = 'Excellent! You have outstanding cyber safety awareness. Share this quiz with your friends and family!'; }
+      else if (pct >= 0.6){ title = '🛡️ Good Job!'; msg = 'You have good awareness, but there\'s room to improve. Review the modules and try again.'; }
+      else                 { title = '📚 Keep Learning!'; msg = 'It\'s okay — this is a learning experience. Explore all the modules above and retake the quiz.'; }
+
+      document.getElementById('result-title').textContent = title;
+      document.getElementById('result-msg').textContent = msg;
+    }
+
+    function restartQuiz() {
+      currentQ = 0; score = 0; quizStarted = true;
+      document.getElementById('quiz-active').style.display = '';
+      document.getElementById('quiz-result').classList.remove('show');
+      renderQuestion();
+    }
+
+    window.showModule = showModule;
+    window.selectOption = selectOption;
+    window.nextQuestion = nextQuestion;
+    window.restartQuiz = restartQuiz;
+
+    // Auto-init first module
+    showModule('phishing');
+  </script>
+</body>
+</html>

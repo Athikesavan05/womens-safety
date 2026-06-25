@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Women Safety & Cyber Protection System — Emergency SOS alerts, safe route navigation, incident reporting, and cyber safety resources.">
+  <meta name="keywords" content="women safety, SOS alert, cyber protection, emergency, India, safe routes">
+  <meta name="author" content="Women Safety System">
+  <meta property="og:title" content="Women Safety & Cyber Protection System">
+  <meta property="og:description" content="Your safety, our priority. Emergency SOS, safe routes, cyber protection, and community alerts.">
+  <meta property="og:type" content="website">
+  <title>SafeGuard — Women Safety & Cyber Protection</title>
+
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/animations.css">
+
+  <style>
+    /* ---- PAGE-SPECIFIC STYLES ---- */
+    main { position: relative; z-index: 1; }
+
+    /* HERO */
+    .hero-section {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      padding: 100px 0 60px;
+    }
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: center;
+    }
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      border-radius: 999px;
+      background: rgba(138,43,226,0.15);
+      border: 1px solid rgba(138,43,226,0.3);
+      font-size: 0.82rem;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: hsl(270,60%,75%);
+      margin-bottom: 1.5rem;
+      animation: fade-down 0.6s ease both;
+    }
+    .hero-eyebrow i { animation: heartbeat 1.5s ease-in-out infinite; }
+
+    .hero-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: clamp(2.8rem, 6vw, 4.2rem);
+      font-weight: 900;
+      line-height: 1.1;
+      letter-spacing: -1px;
+      margin-bottom: 1.5rem;
+      animation: fade-up 0.7s ease 0.1s both;
+    }
+    .hero-desc {
+      font-size: 1.05rem;
+      color: hsl(240,10%,65%);
+      line-height: 1.8;
+      margin-bottom: 2rem;
+      max-width: 500px;
+      animation: fade-up 0.7s ease 0.2s both;
+    }
+    .hero-actions {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      animation: fade-up 0.7s ease 0.3s both;
+    }
+
+    /* SOS Button — Hero side */
+    .sos-panel {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2rem;
+      animation: scale-in 0.7s cubic-bezier(0.34,1.56,0.64,1) 0.2s both;
+    }
+    .sos-ring-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 280px;
+      height: 280px;
+    }
+    .sos-ring {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      border: 2px solid rgba(220,38,38,0.4);
+      animation: wave-ring 2.5s ease-out infinite;
+    }
+    .sos-ring:nth-child(2) { animation-delay: 0.8s; }
+    .sos-ring:nth-child(3) { animation-delay: 1.6s; }
+
+    .sos-btn {
+      width: 180px; height: 180px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, hsl(0,85%,45%), hsl(340,85%,55%));
+      border: none;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      color: #fff;
+      position: relative;
+      z-index: 2;
+      box-shadow: 0 0 60px rgba(220,38,38,0.5), 0 0 120px rgba(220,38,38,0.2);
+      transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1);
+      animation: sos-pulse 2.5s ease-in-out infinite;
+    }
+    .sos-btn:hover {
+      transform: scale(1.08);
+      box-shadow: 0 0 80px rgba(220,38,38,0.7), 0 0 150px rgba(220,38,38,0.3);
+    }
+    .sos-btn:active { transform: scale(0.96); }
+    .sos-btn.activated { background: linear-gradient(135deg, hsl(150,65%,40%), hsl(150,65%,35%)); }
+
+    .sos-btn i { font-size: 2.5rem; }
+    .sos-label {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.6rem;
+      font-weight: 900;
+      letter-spacing: 4px;
+    }
+    .sos-sub { font-size: 0.72rem; opacity: 0.85; letter-spacing: 1px; }
+
+    .sos-status {
+      font-size: 0.9rem;
+      color: hsl(240,10%,65%);
+      text-align: center;
+    }
+    .sos-status.active { color: hsl(150,65%,55%); font-weight: 600; }
+
+    /* SOS MODAL */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.8);
+      backdrop-filter: blur(8px);
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    .modal-overlay.open { opacity: 1; pointer-events: all; }
+    .modal {
+      background: hsl(240,18%,11%);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 24px;
+      padding: 2.5rem;
+      max-width: 500px;
+      width: 100%;
+      transform: scale(0.9);
+      transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .modal-overlay.open .modal { transform: scale(1); }
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.5rem;
+    }
+    .modal-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.4rem;
+      font-weight: 800;
+    }
+    .modal-close {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(255,255,255,0.08);
+      color: hsl(240,10%,65%);
+      transition: all 0.2s;
+    }
+    .modal-close:hover { background: rgba(255,255,255,0.15); color: #fff; }
+
+    .contact-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      margin-bottom: 0.75rem;
+    }
+    .contact-avatar {
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(135deg, hsl(270,70%,55%), hsl(340,80%,65%));
+      font-size: 1.1rem;
+      color: #fff;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .contact-name { font-weight: 600; font-size: 0.95rem; }
+    .contact-number { font-size: 0.82rem; color: hsl(240,10%,60%); }
+    .contact-send {
+      margin-left: auto;
+      padding: 6px 14px;
+      border-radius: 999px;
+      background: rgba(220,38,38,0.2);
+      color: hsl(0,85%,72%);
+      border: 1px solid rgba(220,38,38,0.3);
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .contact-send:hover { background: rgba(220,38,38,0.35); }
+
+    .sos-location-display {
+      padding: 1rem;
+      border-radius: 12px;
+      background: rgba(59,130,246,0.1);
+      border: 1px solid rgba(59,130,246,0.2);
+      font-size: 0.88rem;
+      color: hsl(210,80%,75%);
+      margin-bottom: 1.5rem;
+      display: flex;
+      gap: 0.75rem;
+      align-items: flex-start;
+    }
+    .sos-location-display i { color: hsl(210,80%,60%); margin-top: 2px; flex-shrink: 0; }
+
+    .modal-actions { display: flex; gap: 1rem; flex-wrap: wrap; }
+
+    /* QUICK LINKS SECTION */
+    .quick-links { padding: 5rem 0; }
+    .quick-links h2 {
+      font-family: 'Outfit', sans-serif;
+      font-size: clamp(1.8rem, 4vw, 2.4rem);
+      font-weight: 800;
+      text-align: center;
+      margin-bottom: 0.75rem;
+    }
+    .quick-links .subtitle {
+      text-align: center;
+      color: hsl(240,10%,60%);
+      margin-bottom: 3rem;
+      font-size: 1rem;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+    }
+    .feat-card {
+      padding: 2rem;
+      border-radius: 20px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      transition: all 0.35s cubic-bezier(0.34,1.56,0.64,1);
+      text-decoration: none;
+      display: block;
+      position: relative;
+      overflow: hidden;
+    }
+    .feat-card::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% 0%, rgba(138,43,226,0.12), transparent 70%);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .feat-card:hover {
+      transform: translateY(-8px) scale(1.01);
+      border-color: rgba(138,43,226,0.4);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.4), 0 0 40px rgba(138,43,226,0.2);
+    }
+    .feat-card:hover::after { opacity: 1; }
+
+    .feat-icon {
+      width: 60px; height: 60px;
+      border-radius: 16px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.6rem;
+      color: #fff;
+      margin-bottom: 1.25rem;
+      position: relative;
+      z-index: 1;
+      transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .feat-card:hover .feat-icon { transform: scale(1.1) rotate(-6deg); }
+    .feat-icon.purple   { background: linear-gradient(135deg, hsl(270,70%,50%), hsl(270,70%,40%)); box-shadow: 0 8px 24px rgba(138,43,226,0.4); }
+    .feat-icon.rose     { background: linear-gradient(135deg, hsl(340,80%,60%), hsl(340,80%,50%)); box-shadow: 0 8px 24px rgba(233,30,99,0.4); }
+    .feat-icon.blue     { background: linear-gradient(135deg, hsl(210,80%,55%), hsl(210,80%,45%)); box-shadow: 0 8px 24px rgba(59,130,246,0.4); }
+    .feat-icon.green    { background: linear-gradient(135deg, hsl(150,65%,45%), hsl(150,65%,35%)); box-shadow: 0 8px 24px rgba(34,197,94,0.4); }
+    .feat-icon.orange   { background: linear-gradient(135deg, hsl(30,90%,55%), hsl(30,90%,45%)); box-shadow: 0 8px 24px rgba(249,115,22,0.4); }
+    .feat-icon.teal     { background: linear-gradient(135deg, hsl(180,70%,45%), hsl(180,70%,35%)); box-shadow: 0 8px 24px rgba(20,184,166,0.4); }
+
+    .feat-card h3 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 0.6rem;
+      position: relative; z-index: 1;
+    }
+    .feat-card p {
+      font-size: 0.88rem;
+      color: hsl(240,10%,60%);
+      line-height: 1.7;
+      margin-bottom: 1.25rem;
+      position: relative; z-index: 1;
+    }
+    .feat-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.84rem;
+      font-weight: 600;
+      color: hsl(270,60%,72%);
+      position: relative; z-index: 1;
+      transition: gap 0.2s;
+    }
+    .feat-card:hover .feat-link { gap: 10px; }
+
+    /* STATS */
+    .stats-section { padding: 4rem 0; border-top: 1px solid rgba(255,255,255,0.06); border-bottom: 1px solid rgba(255,255,255,0.06); }
+    .stats-inner { display: grid; grid-template-columns: repeat(4,1fr); gap: 2rem; text-align: center; }
+    .stat-item {}
+    .stat-num {
+      font-family: 'Outfit', sans-serif;
+      font-size: 2.8rem;
+      font-weight: 900;
+      background: linear-gradient(135deg, hsl(270,70%,65%), hsl(340,80%,65%));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      display: block;
+    }
+    .stat-lbl { font-size: 0.85rem; color: hsl(240,10%,55%); text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; }
+
+    /* EMERGENCY STRIP */
+    .emergency-strip {
+      padding: 1.2rem 0;
+      background: linear-gradient(135deg, hsl(0,80%,35%), hsl(340,80%,40%));
+      border-top: 1px solid rgba(255,255,255,0.1);
+    }
+    .strip-ticker {
+      display: flex;
+      align-items: center;
+      gap: 2.5rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .strip-ticker .label {
+      font-weight: 800;
+      font-size: 0.82rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.8);
+      border-right: 1px solid rgba(255,255,255,0.3);
+      padding-right: 2rem;
+    }
+    .strip-num {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: #fff;
+      font-weight: 700;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: opacity 0.2s;
+      text-decoration: none;
+    }
+    .strip-num:hover { opacity: 0.8; }
+    .strip-num i { opacity: 0.9; }
+    .strip-num strong { font-size: 1.05rem; letter-spacing: 1px; }
+
+    @media (max-width: 1024px) {
+      .hero-grid { grid-template-columns: 1fr; text-align: center; }
+      .hero-desc { margin-inline: auto; }
+      .hero-actions { justify-content: center; }
+      .sos-panel { margin-top: 2rem; }
+      .features-grid { grid-template-columns: repeat(2, 1fr); }
+      .stats-inner { grid-template-columns: repeat(2,1fr); }
+    }
+    @media (max-width: 600px) {
+      .features-grid { grid-template-columns: 1fr; }
+      .stats-inner { grid-template-columns: repeat(2,1fr); }
+      .sos-ring-wrapper { width: 220px; height: 220px; }
+      .sos-btn { width: 140px; height: 140px; }
+      .sos-btn i { font-size: 2rem; }
+      .sos-label { font-size: 1.3rem; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Background Orbs -->
+  <div class="glow-bg" aria-hidden="true">
+    <div class="glow-orb orb-1"></div>
+    <div class="glow-orb orb-2"></div>
+    <div class="glow-orb orb-3"></div>
+  </div>
+
+  <!-- Progress Bar -->
+  <div class="page-progress" id="page-progress" role="progressbar" aria-hidden="true"></div>
+
+  <!-- Mobile Menu Overlay -->
+  <div id="nav-overlay" style="position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:150;display:none;" onclick="this.style.display='none'"></div>
+
+  <!-- ===== NAVBAR ===== -->
+  <nav class="navbar" id="navbar" role="navigation" aria-label="Main navigation">
+    <div class="nav-container">
+      <a href="index.html" class="logo" aria-label="SafeGuard Home">
+        <span class="shield-icon"><i class="fa-solid fa-shield-halved"></i></span>
+        <span><span class="text-gradient">Safe</span>Guard</span>
+      </a>
+
+      <button class="mobile-toggle" id="mobile-toggle" aria-label="Toggle menu" aria-expanded="false">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+
+      <div class="nav-menu" id="nav-menu">
+        <ul class="nav-list" role="menubar">
+          <li role="none"><a href="index.html" class="nav-link active" role="menuitem">Home</a></li>
+          <li role="none"><a href="safe-route.html" class="nav-link" role="menuitem">Safe Routes</a></li>
+          <li role="none"><a href="cyber-safety.html" class="nav-link" role="menuitem">Cyber Safety</a></li>
+          <li role="none"><a href="report-incident.html" class="nav-link" role="menuitem">Report</a></li>
+          <li role="none"><a href="community-alerts.html" class="nav-link" role="menuitem">Alerts</a></li>
+          <li role="none"><a href="resources.html" class="nav-link" role="menuitem">Resources</a></li>
+        </ul>
+        <a href="#sos-trigger" class="nav-sos-btn" id="nav-sos" onclick="triggerSOS(event)">
+          <i class="fa-solid fa-bell"></i> SOS
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <main>
+    <!-- ===== HERO SECTION ===== -->
+    <section id="hero" class="hero-section" aria-labelledby="hero-title">
+      <div class="container">
+        <div class="hero-grid">
+          <!-- Left: Text -->
+          <div class="hero-content">
+            <span class="hero-eyebrow">
+              <i class="fa-solid fa-heart-pulse" style="color:#ef4444;"></i>
+              Your Safety, Our Priority
+            </span>
+            <h1 class="hero-title" id="hero-title">
+              Empowering Women.<br>
+              <span class="text-gradient">Every Step,</span><br>
+              Every Day.
+            </h1>
+            <p class="hero-desc">
+              A comprehensive safety platform providing emergency SOS alerts, safe route navigation, 
+              cyber protection education, incident reporting, and real-time community alerts — all in one place.
+            </p>
+            <div class="hero-actions">
+              <button class="btn btn-danger btn-lg" id="hero-sos-btn" onclick="triggerSOS(event)" aria-label="Trigger Emergency SOS">
+                <i class="fa-solid fa-bell-ring"></i>
+                Emergency SOS
+              </button>
+              <a href="safe-route.html" class="btn btn-secondary btn-lg">
+                <i class="fa-solid fa-map-location-dot"></i>
+                Safe Routes
+              </a>
+            </div>
+          </div>
+
+          <!-- Right: SOS Button -->
+          <div class="sos-panel" aria-label="SOS Emergency Button">
+            <div class="sos-ring-wrapper">
+              <div class="sos-ring" aria-hidden="true"></div>
+              <div class="sos-ring" aria-hidden="true"></div>
+              <div class="sos-ring" aria-hidden="true"></div>
+              <button class="sos-btn" id="main-sos-btn" onclick="triggerSOS(event)" aria-label="Press to send emergency SOS alert">
+                <i class="fa-solid fa-bell-ring"></i>
+                <span class="sos-label">SOS</span>
+                <span class="sos-sub">Press for Help</span>
+              </button>
+            </div>
+            <p class="sos-status" id="sos-status">
+              <i class="fa-solid fa-circle-dot" style="color:#ef4444; margin-right:6px;"></i>
+              Ready — Press SOS to send emergency alert
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== STATS SECTION ===== -->
+    <section class="stats-section" aria-label="Safety statistics">
+      <div class="container">
+        <div class="stats-inner">
+          <div class="stat-item reveal">
+            <span class="stat-num" id="stat-reports">0</span>
+            <span class="stat-lbl">Incidents Reported</span>
+          </div>
+          <div class="stat-item reveal reveal-delay-1">
+            <span class="stat-num" id="stat-alerts">0</span>
+            <span class="stat-lbl">Community Alerts</span>
+          </div>
+          <div class="stat-item reveal reveal-delay-2">
+            <span class="stat-num" id="stat-routes">0</span>
+            <span class="stat-lbl">Safe Routes Checked</span>
+          </div>
+          <div class="stat-item reveal reveal-delay-3">
+            <span class="stat-num" id="stat-users">0</span>
+            <span class="stat-lbl">Women Protected</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== FEATURES QUICK LINKS ===== -->
+    <section class="quick-links section-padding" aria-labelledby="features-title">
+      <div class="container">
+        <span class="section-subtitle">All Features</span>
+        <h2 class="section-title" id="features-title" style="text-align:center;">Everything You Need<br>To Stay <span class="text-gradient">Safe & Informed</span></h2>
+        <div class="header-line" style="margin:0 auto 3rem;"></div>
+
+        <div class="features-grid">
+          <!-- SOS -->
+          <a href="#sos-trigger" class="feat-card reveal" onclick="triggerSOS(event)" aria-label="Emergency SOS Feature">
+            <div class="feat-icon rose"><i class="fa-solid fa-bell-ring"></i></div>
+            <h3>Emergency SOS</h3>
+            <p>One-tap SOS alert sends your live location to emergency contacts via WhatsApp, SMS, and email instantly.</p>
+            <span class="feat-link">Activate Now <i class="fa-solid fa-arrow-right"></i></span>
+          </a>
+          <!-- Safe Route -->
+          <a href="safe-route.html" class="feat-card reveal reveal-delay-1" aria-label="Safe Route Navigation">
+            <div class="feat-icon blue"><i class="fa-solid fa-map-location-dot"></i></div>
+            <h3>Safe Route Navigator</h3>
+            <p>View nearby police stations, hospitals, and safe zones on an interactive map. Find safer routes 24/7.</p>
+            <span class="feat-link">Open Map <i class="fa-solid fa-arrow-right"></i></span>
+          </a>
+          <!-- Cyber Safety -->
+          <a href="cyber-safety.html" class="feat-card reveal reveal-delay-2" aria-label="Cyber Safety Module">
+            <div class="feat-icon purple"><i class="fa-solid fa-shield-halved"></i></div>
+            <h3>Cyber Safety Module</h3>
+            <p>Learn to identify phishing scams, fake profiles, and online harassment. Take our quiz and test your knowledge.</p>
+            <span class="feat-link">Learn More <i class="fa-solid fa-arrow-right"></i></span>
+          </a>
+          <!-- Report -->
+          <a href="report-incident.html" class="feat-card reveal reveal-delay-3" aria-label="Report an Incident">
+            <div class="feat-icon orange"><i class="fa-solid fa-file-circle-exclamation"></i></div>
+            <h3>Incident Reporting</h3>
+            <p>Report harassment, stalking, or unsafe locations anonymously. Reports are stored securely in the cloud.</p>
+            <span class="feat-link">File Report <i class="fa-solid fa-arrow-right"></i></span>
+          </a>
+          <!-- Alerts -->
+          <a href="community-alerts.html" class="feat-card reveal reveal-delay-4" aria-label="Community Alerts Map">
+            <div class="feat-icon green"><i class="fa-solid fa-triangle-exclamation"></i></div>
+            <h3>Community Alerts</h3>
+            <p>Real-time map of reported unsafe areas in your community. Stay informed and stay safe.</p>
+            <span class="feat-link">View Alerts <i class="fa-solid fa-arrow-right"></i></span>
+          </a>
+          <!-- Resources -->
+          <a href="resources.html" class="feat-card reveal reveal-delay-5" aria-label="Safety Resources">
+            <div class="feat-icon teal"><i class="fa-solid fa-book-open"></i></div>
+            <h3>Safety Resources</h3>
+            <p>Emergency numbers, women's helplines, legal guidance under IPC & IT Act, and NGO directory.</p>
+            <span class="feat-link">View Resources <i class="fa-solid fa-arrow-right"></i></span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== EMERGENCY STRIP ===== -->
+    <div class="emergency-strip" role="complementary" aria-label="Emergency contact numbers">
+      <div class="container">
+        <div class="strip-ticker">
+          <span class="label"><i class="fa-solid fa-phone-volume"></i> &nbsp;Emergency Numbers</span>
+          <a href="tel:112" class="strip-num" aria-label="National Emergency 112"><i class="fa-solid fa-phone"></i> National Emergency <strong>112</strong></a>
+          <a href="tel:1091" class="strip-num" aria-label="Women Helpline 1091"><i class="fa-solid fa-venus"></i> Women Helpline <strong>1091</strong></a>
+          <a href="tel:100" class="strip-num" aria-label="Police 100"><i class="fa-solid fa-shield"></i> Police <strong>100</strong></a>
+          <a href="tel:102" class="strip-num" aria-label="Ambulance 102"><i class="fa-solid fa-truck-medical"></i> Ambulance <strong>102</strong></a>
+          <a href="tel:1930" class="strip-num" aria-label="Cyber Crime 1930"><i class="fa-solid fa-computer"></i> Cyber Crime <strong>1930</strong></a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ===== SOS MODAL ===== -->
+  <div class="modal-overlay" id="sos-modal" role="dialog" aria-modal="true" aria-labelledby="sos-modal-title">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 class="modal-title" id="sos-modal-title">
+          <span style="color:#ef4444;"><i class="fa-solid fa-bell-ring"></i></span>
+          &nbsp;SOS Alert
+        </h2>
+        <button class="modal-close" onclick="closeSOSModal()" aria-label="Close SOS modal">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="sos-location-display" id="sos-location-display">
+        <i class="fa-solid fa-location-dot"></i>
+        <span id="sos-location-text">Fetching your location…</span>
+      </div>
+
+      <p style="font-size:0.88rem;color:hsl(240,10%,60%);margin-bottom:1rem;">
+        Send your location and an SOS message to your emergency contacts:
+      </p>
+
+      <!-- Emergency Contacts -->
+      <div id="sos-contacts">
+        <div class="contact-item">
+          <div class="contact-avatar">M</div>
+          <div>
+            <div class="contact-name">Mom</div>
+            <div class="contact-number">+91 98765 43210</div>
+          </div>
+          <button class="contact-send" onclick="sendSOSToContact('+919876543210','Mom')">Send</button>
+        </div>
+        <div class="contact-item">
+          <div class="contact-avatar">D</div>
+          <div>
+            <div class="contact-name">Dad</div>
+            <div class="contact-number">+91 98765 43211</div>
+          </div>
+          <button class="contact-send" onclick="sendSOSToContact('+919876543211','Dad')">Send</button>
+        </div>
+        <div class="contact-item">
+          <div class="contact-avatar">F</div>
+          <div>
+            <div class="contact-name">Friend</div>
+            <div class="contact-number">+91 98765 43212</div>
+          </div>
+          <button class="contact-send" onclick="sendSOSToContact('+919876543212','Friend')">Send</button>
+        </div>
+      </div>
+
+      <div class="modal-actions" style="margin-top:1.5rem;">
+        <button class="btn btn-danger" id="send-all-btn" onclick="sendSOSToAll()" style="flex:1;">
+          <i class="fa-solid fa-paper-plane"></i> Send to All Contacts
+        </button>
+        <a href="tel:112" class="btn btn-secondary" style="flex:1;">
+          <i class="fa-solid fa-phone"></i> Call 112
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast container -->
+  <div id="toast-container" class="toast-container" aria-live="polite"></div>
+
+  <!-- Scripts -->
+  <script src="js/main.js"></script>
+  <script src="js/sos.js"></script>
+  <script>
+    // Animate counters on scroll
+    const counters = [
+      { id: 'stat-reports', target: 1240 },
+      { id: 'stat-alerts',  target: 847  },
+      { id: 'stat-routes',  target: 3562 },
+      { id: 'stat-users',   target: 9870 },
+    ];
+    const statsObserver = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          counters.forEach(c => {
+            const el = document.getElementById(c.id);
+            if (el) WS.animateCounter(el, c.target);
+          });
+          statsObserver.disconnect();
+        }
+      });
+    }, { threshold: 0.3 });
+    const statsSection = document.querySelector('.stats-section');
+    if (statsSection) statsObserver.observe(statsSection);
+  </script>
+</body>
+</html>
