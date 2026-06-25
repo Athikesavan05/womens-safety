@@ -31,7 +31,7 @@ Users can report unsafe incidents.
 Reports are stored securely in Firebase.
 Users receive safety alerts and access cyber safety resources.
 Installation
-git clone https://github.com/your-username/women-safety-system.git
+git clone https://github.com/Athikesavan05/women-safety-system.git
 cd women-safety-system
 
 Configure Firebase credentials and run the application.
