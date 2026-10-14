@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="description" content="SafeHer SafeRoutes – Intelligent Women's Safety Road Navigation. Real road-by-road routing, crowd & safety heat map, emergency POIs, and live location sharing powered by OpenStreetMap & OSRM.">
+  <meta name="keywords" content="SafeRoutes, Women Safety Navigation, OpenStreetMap, Leaflet Route Planner, Emergency SOS, Well-lit paths, OSRM Road Routing">
+  <meta name="theme-color" content="#070913">
+
+  <title>SafeRoutes™ | Live Road Navigation & Safety Map – SafeHer</title>
+
+  <!-- Google Fonts: Plus Jakarta Sans & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Leaflet Interactive Maps CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+
+  <!-- Base Dashboard Styles & SafeRoutes Module Styles -->
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/saferoutes.css">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="assets/icons/shield-logo.svg">
+</head>
+<body class="dashboard-body">
+
+  <!-- Ambient Animated Background Scene -->
+  <div class="ambient-scene" aria-hidden="true">
+    <canvas id="particleCanvas"></canvas>
+    <div class="orb orb-pink"></div>
+    <div class="orb orb-purple"></div>
+    <div class="orb orb-cyan"></div>
+    <div class="security-grid"></div>
+  </div>
+
+  <!-- Notification Toast Container -->
+  <div id="toastContainer" class="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- Top Navigation Bar -->
+  <nav class="dashboard-nav" aria-label="Main Navigation">
+    <div class="nav-inner">
+      <a href="dashboard.html" class="nav-brand" title="SafeHer Home Dashboard">
+        <div class="nav-logo-wrap">
+          <img src="assets/icons/shield-logo.svg" alt="SafeHer Brand Logo" class="nav-logo-image" width="38" height="38">
+        </div>
+        <div class="nav-brand-text">
+          <span class="nav-brand-title">Safe<span class="brand-highlight">Her</span></span>
+          <span class="nav-brand-sub">Safety System</span>
+        </div>
+      </a>
+
+      <!-- Center Navigation Links -->
+      <div class="nav-center-status" style="display: flex; align-items: center; gap: 14px;">
+        <a href="dashboard.html" style="color: var(--text-secondary); text-decoration: none; font-size: 0.82rem; font-weight: 600; display: flex; align-items: center; gap: 6px; transition: color 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='var(--text-secondary)'">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="7" height="7"></rect>
+            <rect x="14" y="3" width="7" height="7"></rect>
+            <rect x="14" y="14" width="7" height="7"></rect>
+            <rect x="3" y="14" width="7" height="7"></rect>
+          </svg>
+          <span>Dashboard</span>
+        </a>
+
+        <span style="color: rgba(255,255,255,0.2);">|</span>
+
+        <span style="color: var(--primary-pink); font-size: 0.82rem; font-weight: 700; display: flex; align-items: center; gap: 6px;">
+          <span class="pulse-dot" style="background-color: var(--primary-pink);"></span>
+          <span>Live SafeRoutes™</span>
+        </span>
+      </div>
+
+      <!-- User Profile & Sign Out -->
+      <div class="nav-actions">
+        <a href="dashboard.html#profileSection" class="nav-user-chip" title="View Profile">
+          <div id="navUserAvatar" class="nav-user-avatar">E</div>
+          <span id="navUserName" class="nav-user-name">Elena Vance</span>
+        </a>
+        <button type="button" id="navLogoutBtn" class="nav-logout-btn" title="Sign out safely">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+            <polyline points="16 17 21 12 16 7"></polyline>
+            <line x1="21" y1="12" x2="9" y2="12"></line>
+          </svg>
+          <span>Logout</span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Live Location Sharing Active Banner (Hidden when not broadcasting) -->
+  <div id="liveSharingBanner" class="live-sharing-banner" style="display: none;" role="status" aria-live="polite">
+    <div class="sharing-banner-inner">
+      <div class="sharing-banner-status">
+        <span class="sharing-pulse-ring"></span>
+        <span class="sharing-pulse-dot"></span>
+        <div>
+          <strong class="sharing-status-title">LIVE LOCATION SHARING ACTIVE</strong>
+          <div class="sharing-status-sub">
+            Broadcasting encrypted GPS coordinates &bull; <span id="sharingTimerText">00:00</span> elapsed &bull;
+            <span id="sharingCoordsText">Tracking...</span>
+          </div>
+        </div>
+      </div>
+      <div class="sharing-banner-actions">
+        <button type="button" id="bannerCopyLinkBtn" class="banner-action-btn copy-btn" title="Copy tracking link">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+          <span>Copy Link</span>
+        </button>
+        <button type="button" id="bannerStopSharingBtn" class="banner-action-btn stop-btn" title="Stop live location sharing">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><rect x="9" y="9" width="6" height="6"></rect></svg>
+          <span>Stop Sharing</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Container -->
+  <main class="dashboard-container">
+
+    <!-- SafeRoutes Header Banner -->
+    <section class="welcome-banner" aria-label="SafeRoutes Navigation Header">
+      <div class="welcome-left">
+        <div style="display: inline-flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+          <a href="dashboard.html" style="color: var(--cyber-cyan); font-size: 0.78rem; text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            Back to Dashboard
+          </a>
+          <span style="color: var(--text-muted); font-size: 0.78rem;">/</span>
+          <span style="color: var(--text-secondary); font-size: 0.78rem;">Live Road Navigation</span>
+        </div>
+        <h1 class="welcome-greeting" style="font-size: 1.65rem;">
+          SafeRoutes™ <span class="user-name-highlight">Live Road Navigator</span>
+        </h1>
+        <p class="welcome-message">
+          Real road-by-road navigation powered by OpenStreetMap & OSRM. Visualizes real highway curves, crowd & safety heat map, and nearby emergency shelters.
+        </p>
+      </div>
+
+      <div class="welcome-right" style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+        <div class="protection-badge" style="background: rgba(16, 185, 129, 0.12); border-color: rgba(16, 185, 129, 0.4); color: #10b981;">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+          <span>Real Road-Routing Active</span>
+        </div>
+        <button type="button" id="reportIncidentHeaderBtn" class="report-advisory-btn" title="Submit a safety observation">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+          <span>Report Safety Advisory</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- SafeRoutes Dual Column Grid -->
+    <div class="saferoutes-layout">
+
+      <!-- ====================================================================
+           LEFT COLUMN: Route Planning & Alternative Options Cards
+           ==================================================================== -->
+      <aside class="planning-panel" aria-label="Route Planning Controls">
+
+        <!-- 1. Planning Inputs Card -->
+        <section class="planning-card">
+          <div class="card-title-row" style="margin-bottom: 0;">
+            <div class="card-title-group">
+              <div class="card-title-icon cyan-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="6" cy="19" r="3"></circle>
+                  <path d="M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15"></path>
+                  <circle cx="18" cy="5" r="3"></circle>
+                </svg>
+              </div>
+              <div>
+                <h2 class="card-title-text" style="font-size: 1.05rem;">Plan Road Journey</h2>
+                <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 1px;">Calculates actual turn-by-turn road routes</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="route-inputs-container">
+            <!-- Departure Origin -->
+            <div class="route-input-group" id="originSearchWrap">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <label for="originInput" style="font-size: 0.74rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.04em;">
+                  Departure Origin
+                </label>
+                <span id="gpsStatusBadge" class="gps-status-badge">
+                  <span class="pulse-dot-sm"></span>
+                  <span id="gpsStatusText">Detecting GPS...</span>
+                </span>
+              </div>
+              <div class="route-input-wrap">
+                <span class="route-input-icon origin-dot" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <circle cx="12" cy="12" r="3" fill="currentColor"></circle>
+                  </svg>
+                </span>
+                <input 
+                  type="text" 
+                  id="originInput" 
+                  class="route-text-input" 
+                  placeholder="Enter start location or click My GPS..." 
+                  autocomplete="off"
+                >
+                <button type="button" id="useMyLocBtn" class="use-my-loc-btn" title="Acquire live GPS coordinates">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="2" x2="12" y2="6"></line>
+                    <line x1="12" y1="18" x2="12" y2="22"></line>
+                    <line x1="2" y1="12" x2="6" y2="12"></line>
+                    <line x1="18" y1="12" x2="22" y2="12"></line>
+                  </svg>
+                  <span>My GPS</span>
+                </button>
+              </div>
+              <div id="originSearchResults" class="map-search-dropdown" style="top: 100%; margin-top: 4px;" role="listbox"></div>
+            </div>
+
+            <!-- Destination Input with Autocomplete -->
+            <div class="route-input-group" id="destSearchWrap">
+              <label for="destInput" style="font-size: 0.74rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.04em;">
+                Destination Target
+              </label>
+              <div class="route-input-wrap">
+                <span class="route-input-icon dest-dot" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                    <circle cx="12" cy="10" r="3"></circle>
+                  </svg>
+                </span>
+                <input 
+                  type="text" 
+                  id="destInput" 
+                  class="route-text-input" 
+                  placeholder="Search landmark, street name, metro, hospital..." 
+                  autocomplete="off"
+                >
+              </div>
+              <!-- Autocomplete Results Dropdown -->
+              <div id="destSearchResults" class="map-search-dropdown" style="top: 100%; margin-top: 4px;" role="listbox"></div>
+            </div>
+
+            <!-- Transport Mode Switcher -->
+            <div style="display: flex; flex-direction: column; gap: 6px; margin-top: 4px;">
+              <span style="font-size: 0.74rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.04em;">
+                Navigation Profile
+              </span>
+              <div class="mode-toggle-group" role="group" aria-label="Transport Mode Selection">
+                <button type="button" id="modeWalkBtn" class="mode-btn active" aria-pressed="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="5" r="2"></circle>
+                    <path d="m15 22-3-7-3 7"></path>
+                    <path d="m12 15-3-3 4-5 3 3"></path>
+                  </svg>
+                  <span>Pedestrian Walk</span>
+                </button>
+                <button type="button" id="modeDriveBtn" class="mode-btn" aria-pressed="false">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="2" y="5" width="20" height="14" rx="2"></rect>
+                    <line x1="2" y1="10" x2="22" y2="10"></line>
+                  </svg>
+                  <span>Vehicle / Transit</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div style="display: flex; gap: 10px; margin-top: 8px;">
+              <button type="button" id="findRoutesBtn" class="submit-btn" style="flex: 1;">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                  <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                  <polyline points="2 17 12 22 22 17"></polyline>
+                  <polyline points="2 12 12 17 22 12"></polyline>
+                </svg>
+                <span>Calculate Road Routes</span>
+              </button>
+              <button type="button" id="clearRouteBtn" class="cancel-modal-btn" style="padding: 0 16px; font-size: 0.85rem;" title="Reset destination & routes">
+                Reset
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- 2. Route Comparison Options Cards Container -->
+        <section class="planning-card">
+          <div class="card-title-row" style="margin-bottom: 0;">
+            <div class="card-title-group">
+              <div class="card-title-icon pink-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                  <polyline points="2 17 12 22 22 17"></polyline>
+                  <polyline points="2 12 12 17 22 12"></polyline>
+                </svg>
+              </div>
+              <div>
+                <h2 class="card-title-text" style="font-size: 1.05rem;">Available Road Routes</h2>
+                <div style="font-size: 0.72rem; color: var(--text-muted);">Compare real road distance, travel time & safety factors</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Dynamic Route Option Cards -->
+          <div id="routeOptionsContainer" class="route-results-wrap" aria-live="polite">
+            <div class="route-placeholder-state">
+              <svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="currentColor" stroke-width="1.5">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon>
+              </svg>
+              <div>Enter destination above or select a nearby emergency place to calculate actual road-following navigation.</div>
+            </div>
+          </div>
+
+          <!-- Turn-by-Turn Road Navigation Drawer (Shown when route calculated) -->
+          <div id="turnByTurnContainer" class="turn-directions-panel" style="display: none;">
+            <div class="turn-directions-header" id="turnDirectionsToggle">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--cyber-cyan)" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                <strong style="font-size: 0.86rem; color: #fff;">Turn-by-Turn Road Steps</strong>
+              </div>
+              <span id="turnStepCountBadge" class="turn-count-badge">0 steps</span>
+            </div>
+            <div id="turnStepsList" class="turn-steps-list"></div>
+          </div>
+        </section>
+
+        <!-- 3. Recent Route Search History -->
+        <section class="planning-card">
+          <div class="card-title-row" style="margin-bottom: 0;">
+            <div class="card-title-group">
+              <div class="card-title-icon" style="background: rgba(139, 61, 255, 0.15); color: #a855f7; border-color: rgba(139, 61, 255, 0.3);">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+              </div>
+              <div>
+                <h2 class="card-title-text" style="font-size: 0.95rem;">Recent Searches</h2>
+                <div style="font-size: 0.7rem; color: var(--text-muted);">Quick-load frequently traveled destinations</div>
+              </div>
+            </div>
+            <button type="button" id="clearHistoryBtn" style="background: none; border: none; color: var(--text-muted); font-size: 0.72rem; cursor: pointer; text-decoration: underline;">
+              Clear
+            </button>
+          </div>
+
+          <div id="historyListContainer" class="history-list" aria-live="polite">
+            <div style="font-size: 0.76rem; color: var(--text-muted); padding: 4px 0;">No previous routes recorded.</div>
+          </div>
+        </section>
+
+      </aside>
+
+      <!-- ====================================================================
+           RIGHT COLUMN: Interactive Leaflet Map & Safety Intelligence
+           ==================================================================== -->
+      <section class="map-view-column" aria-label="Interactive Map & Safety Intelligence">
+
+        <!-- 1. Leaflet Interactive Map Viewport -->
+        <div class="saferoutes-map-card">
+          <div class="card-title-row" style="margin-bottom: 0;">
+            <div class="card-title-group">
+              <div class="card-title-icon cyan-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon>
+                  <line x1="8" y1="2" x2="8" y2="18"></line>
+                  <line x1="16" y1="6" x2="16" y2="22"></line>
+                </svg>
+              </div>
+              <div>
+                <h2 class="card-title-text" style="font-size: 1.05rem;">Live OpenStreetMap & Road Routing</h2>
+                <div style="font-size: 0.72rem; color: var(--text-muted);">Real street layout, road paths, live GPS tracking & emergency shelters</div>
+              </div>
+            </div>
+
+            <!-- Map Header Badges -->
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span class="card-status-pill pill-active" style="font-size: 0.74rem;">
+                <span class="pulse-dot"></span>
+                <span>OSRM Routing Engine</span>
+              </span>
+              <button type="button" id="legendToggleBtn" class="map-action-btn-sm" title="View Map Legend & Safety Criteria">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                <span>Legend</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Emergency & Important Places Filter Chips Bar -->
+          <div id="poiFilterBar" class="poi-filter-bar" role="toolbar" aria-label="Nearby Emergency & Important Places Filters">
+            <span class="poi-filter-label">Nearby POIs:</span>
+            <div class="poi-chips-scroll">
+              <button type="button" class="poi-chip active" data-cat="all" id="toggleAllPoi">
+                <span>All POIs</span>
+              </button>
+              <button type="button" class="poi-chip active" data-cat="police" id="togglePolice">
+                <span class="poi-chip-dot police"></span>
+                <span>🚓 Police</span>
+              </button>
+              <button type="button" class="poi-chip active" data-cat="hospital" id="toggleHospitals">
+                <span class="poi-chip-dot hospital"></span>
+                <span>🏥 Hospitals</span>
+              </button>
+              <button type="button" class="poi-chip active" data-cat="medical" id="toggleMedical">
+                <span class="poi-chip-dot medical"></span>
+                <span>🚑 Clinics</span>
+              </button>
+              <button type="button" class="poi-chip active" data-cat="fire" id="toggleFire">
+                <span class="poi-chip-dot fire"></span>
+                <span>🚒 Fire</span>
+              </button>
+              <button type="button" class="poi-chip active" data-cat="pharmacy" id="togglePharmacy">
+                <span class="poi-chip-dot pharmacy"></span>
+                <span>💊 Pharmacy</span>
+              </button>
+              <button type="button" class="poi-chip active" data-cat="atm" id="toggleAtm">
+                <span class="poi-chip-dot atm"></span>
+                <span>🏦 ATMs</span>
+              </button>
+              <button type="button" class="poi-chip active" data-cat="fuel" id="toggleFuel">
+                <span class="poi-chip-dot fuel"></span>
+                <span>⛽ Fuel</span>
+              </button>
+              <button type="button" class="poi-chip active" data-cat="transit" id="toggleTransit">
+                <span class="poi-chip-dot transit"></span>
+                <span>🚉 Transit</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Map Container Box with Overlay Controls -->
+          <div class="saferoutes-map-wrap" id="mapWrapContainer">
+            <div id="saferoutesMap" role="region" aria-label="OpenStreetMap interactive navigation route view"></div>
+
+            <!-- Floating Top-Right Layer Controls -->
+            <div class="map-layer-controls">
+              <label class="map-control-chip" title="Toggle Crowd Density Heat Overlay">
+                <input type="checkbox" id="toggleCrowdLayer" checked>
+                <span class="chip-dot crowd-dot"></span>
+                <span>Crowd Density</span>
+              </label>
+
+              <label class="map-control-chip" title="Toggle Community Safety & Hazard Reports">
+                <input type="checkbox" id="toggleSafetyLayer" checked>
+                <span class="chip-dot safety-dot"></span>
+                <span>Safety Reports</span>
+              </label>
+            </div>
+
+            <!-- Floating Bottom-Right Map Control Toolbar -->
+            <div class="map-floating-toolbar" role="toolbar" aria-label="Map Navigation Tools">
+              <button type="button" id="myLocBtn" class="map-tool-btn" title="Locate & Follow My Position">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon></svg>
+                <span class="tooltip">My Location</span>
+              </button>
+              <button type="button" id="refreshLocBtn" class="map-tool-btn" title="Refresh GPS & Nearby POIs">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/></svg>
+                <span class="tooltip">Refresh</span>
+              </button>
+              <button type="button" id="zoomInBtn" class="map-tool-btn" title="Zoom In">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                <span class="tooltip">Zoom In</span>
+              </button>
+              <button type="button" id="zoomOutBtn" class="map-tool-btn" title="Zoom Out">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                <span class="tooltip">Zoom Out</span>
+              </button>
+              <button type="button" id="fullscreenToggleBtn" class="map-tool-btn" title="Expand Map Fullscreen">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
+                <span class="tooltip">Fullscreen</span>
+              </button>
+            </div>
+
+            <!-- Floating Map Legend Drawer (Toggled by Legend button) -->
+            <div id="mapLegendDrawer" class="map-legend-drawer" style="display: none;">
+              <div class="legend-header">
+                <strong>Map Legend & Safety Standards</strong>
+                <button type="button" id="closeLegendBtn" class="close-legend-btn">&times;</button>
+              </div>
+              <div class="legend-content">
+                <div class="legend-section">
+                  <div class="legend-section-title">Crowd Activity Zones (Sensor & Pattern)</div>
+                  <div class="legend-item"><span class="legend-dot green"></span><span>🟢 Normal Crowd / Regulated Footfall</span></div>
+                  <div class="legend-item"><span class="legend-dot yellow"></span><span>🟡 Moderate Crowd Density</span></div>
+                  <div class="legend-item"><span class="legend-dot red"></span><span>🔴 High Crowd / Heavy Congestion</span></div>
+                  <div class="legend-disclaimer">
+                    * Crowded areas are not automatically unsafe; low-crowd areas are not automatically dangerous. Where live sensor telemetry is not available, typical corridor activity patterns are shown without generating fake data.
+                  </div>
+                </div>
+                <div class="legend-section">
+                  <div class="legend-section-title">Community Safety Reports (Verified)</div>
+                  <div class="legend-item"><span class="legend-dot green"></span><span>🟢 Safe Haven / 24/7 Monitored Facility</span></div>
+                  <div class="legend-item"><span class="legend-dot yellow"></span><span>🟡 Caution: Lighting Defect or Construction</span></div>
+                  <div class="legend-item"><span class="legend-dot red"></span><span>🔴 High Concern / Incident Logged</span></div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- 2. Safety Intelligence & Decision-Support Advisory Panel -->
+        <div class="safety-intelligence-panel">
+
+          <!-- Explicit Decision-Support Disclaimer Box -->
+          <div class="safety-advisory-box" role="alert">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            <div class="safety-advisory-text">
+              <strong>Transparent Safety Advisory:</strong> SafeHer route evaluations prioritize primary well-lit corridors, active emergency facilities, and community advisories. No route can ever be guaranteed as "100% safe." Always maintain awareness of your surroundings and utilize the SOS button if you ever feel uncomfortable.
+              <div class="safety-advisory-sub">Data feeds: OpenStreetMap contributors &bull; OSRM routing engine &bull; Community-verified safety reports</div>
+            </div>
+          </div>
+
+          <!-- Community Safety Reports Section -->
+          <div class="reports-section-header">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span class="card-title-icon" style="width: 28px; height: 28px; background: rgba(5, 217, 232, 0.15); color: var(--cyber-cyan); border-color: rgba(5, 217, 232, 0.3);">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+              </span>
+              <strong style="font-size: 0.95rem; color: #fff;">Community Safety Advisories & Verified Havens</strong>
+            </div>
+            <button type="button" id="addNewReportBtn" class="add-report-link-btn">
+              + Add Safety Observation
+            </button>
+          </div>
+
+          <div id="safetyReportsGrid" class="safety-reports-grid">
+            <!-- Dynamically populated from SafeRoutesApp.safetyReports -->
+          </div>
+
+        </div>
+
+        <!-- 3. Emergency Quick-Action Bar -->
+        <div class="emergency-action-bar">
+          <div>
+            <div style="font-size: 0.92rem; font-weight: 700; color: #ffffff; display: flex; align-items: center; gap: 8px;">
+              <span class="pulse-dot" style="background-color: #ff3366;"></span>
+              <span>Emergency Shortcuts & Live Broadcast</span>
+            </div>
+            <div style="font-size: 0.74rem; color: var(--text-muted); margin-top: 2px;">
+              Instant alert dispatch to trusted contacts & live encrypted GPS link
+            </div>
+          </div>
+
+          <div class="emergency-btn-group">
+            <button type="button" id="shareLocationBtn" class="share-route-btn" title="Generate live location tracking link">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="18" cy="5" r="3"></circle>
+                <circle cx="6" cy="12" r="3"></circle>
+                <circle cx="18" cy="19" r="3"></circle>
+                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+              </svg>
+              <span>Share Live Location</span>
+            </button>
+
+            <button type="button" id="safeRoutesSosBtn" class="sos-trigger-btn" title="Initiate emergency SOS broadcast">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+              </svg>
+              <span>EMERGENCY SOS</span>
+            </button>
+          </div>
+        </div>
+
+      </section>
+
+    </div>
+
+  </main>
+
+  <!-- Mobile Bottom Navigation Bar -->
+  <nav class="mobile-bottom-nav" aria-label="Mobile Bottom Navigation">
+    <a href="dashboard.html" class="mobile-nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+      <span>Dashboard</span>
+    </a>
+    <a href="saferoutes.html" class="mobile-nav-item active">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon><line x1="8" y1="2" x2="8" y2="18"></line><line x1="16" y1="6" x2="16" y2="22"></line></svg>
+      <span>SafeRoutes</span>
+    </a>
+    <button type="button" id="mobileSosBtn" class="mobile-nav-item mobile-sos-item">
+      <div class="mobile-sos-circle">SOS</div>
+      <span>Emergency</span>
+    </button>
+    <button type="button" id="mobileShareBtn" class="mobile-nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+      <span>Share GPS</span>
+    </button>
+    <a href="dashboard.html#profileSection" class="mobile-nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+      <span>Profile</span>
+    </a>
+  </nav>
+
+  <!-- ======================================================================
+       MODALS: SOS Confirmation, Share Location & Report Safety Advisory
+       ====================================================================== -->
+
+  <!-- SOS Confirmation Modal -->
+  <div id="sosConfirmModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="sosConfirmTitle">
+    <div class="modal-card" style="max-width: 440px; text-align: center;">
+      <div style="width: 56px; height: 56px; border-radius: 50%; background: rgba(255, 51, 102, 0.2); border: 2px solid #ff3366; margin: 0 auto 16px; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 24px rgba(255, 51, 102, 0.5);">
+        <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#ff3366" stroke-width="2.5">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="12"></line>
+          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+      </div>
+      <h3 id="sosConfirmTitle" style="font-size: 1.25rem; font-weight: 800; color: #ffffff; margin-bottom: 8px;">
+        Trigger Emergency SOS?
+      </h3>
+      <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 20px;">
+        This will immediately dispatch a high-priority emergency notification with your current GPS coordinates to your registered emergency contacts and local security dispatch.
+      </p>
+      <div style="display: flex; gap: 10px;">
+        <button type="button" id="cancelSosBtn" class="cancel-modal-btn" style="flex: 1;">Cancel</button>
+        <button type="button" id="executeSosBtn" class="submit-btn" style="flex: 1; background: linear-gradient(135deg, #ff3366, #ff0055); box-shadow: 0 0 20px rgba(255,51,102,0.6);">
+          Yes, Dispatch SOS
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Share Location Link Modal -->
+  <div id="shareLocationModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="shareModalTitle">
+    <div class="modal-card" style="max-width: 500px;">
+      <div class="modal-header">
+        <h3 id="shareModalTitle" class="modal-title" style="display: flex; align-items: center; gap: 8px;">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="var(--cyber-cyan)" stroke-width="2">
+            <circle cx="18" cy="5" r="3"></circle>
+            <circle cx="6" cy="12" r="3"></circle>
+            <circle cx="18" cy="19" r="3"></circle>
+            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+          </svg>
+          Share Live Location
+        </h3>
+        <button type="button" id="closeShareModalBtn" class="modal-close-btn" aria-label="Close share modal">&times;</button>
+      </div>
+
+      <p style="font-size: 0.84rem; color: var(--text-secondary); line-height: 1.45; margin-bottom: 16px;">
+        Share your real-time GPS location link with trusted contacts. You can stop sharing at any time. Your location is never shared without your explicit action.
+      </p>
+
+      <!-- Live Location Link Input Box -->
+      <div style="display: flex; gap: 8px; margin-bottom: 14px;">
+        <input 
+          type="text" 
+          id="shareLinkInput" 
+          class="form-input" 
+          readonly 
+          style="font-size: 0.78rem; font-family: monospace; background: rgba(0,0,0,0.4);"
+        >
+        <button type="button" id="copyShareLinkBtn" class="submit-btn" style="white-space: nowrap; padding: 0 16px;">
+          Copy Link
+        </button>
+      </div>
+
+      <!-- Quick Share Platforms -->
+      <div class="share-platform-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 16px;">
+        <button type="button" id="shareNativeBtn" class="share-action-chip">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg>
+          <span>Device Share</span>
+        </button>
+        <button type="button" id="shareWhatsappBtn" class="share-action-chip">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#25D366" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+          <span>WhatsApp</span>
+        </button>
+        <button type="button" id="shareSmsBtn" class="share-action-chip">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#05d9e8" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+          <span>SMS Text</span>
+        </button>
+      </div>
+
+      <!-- Sharing Toggle Control -->
+      <div style="padding: 12px; background: rgba(5, 217, 232, 0.08); border: 1px solid rgba(5, 217, 232, 0.25); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: space-between;">
+        <div>
+          <div style="font-size: 0.82rem; font-weight: 700; color: #fff;">Live Broadcast Status</div>
+          <div id="modalSharingStateText" style="font-size: 0.72rem; color: var(--text-muted);">Broadcasting is currently inactive.</div>
+        </div>
+        <button type="button" id="toggleSharingBroadcastBtn" class="submit-btn" style="height: 34px; padding: 0 14px; font-size: 0.78rem;">
+          Start Broadcasting
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Report Safety Advisory Modal -->
+  <div id="reportAdvisoryModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="reportModalTitle">
+    <div class="modal-card" style="max-width: 480px;">
+      <div class="modal-header">
+        <h3 id="reportModalTitle" class="modal-title" style="display: flex; align-items: center; gap: 8px;">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="var(--primary-pink)" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+          Report Safety Advisory
+        </h3>
+        <button type="button" id="closeReportModalBtn" class="modal-close-btn" aria-label="Close report modal">&times;</button>
+      </div>
+
+      <p style="font-size: 0.82rem; color: var(--text-secondary); line-height: 1.45; margin-bottom: 14px;">
+        Contribute to community women safety by reporting poorly lit roads, construction hazards, or verified safe havens. All submissions are moderated.
+      </p>
+
+      <form id="reportAdvisoryForm" style="display: flex; flex-direction: column; gap: 12px;">
+        <div>
+          <label for="reportTypeSelect" style="display: block; font-size: 0.74rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 4px; text-transform: uppercase;">
+            Observation Category
+          </label>
+          <select id="reportTypeSelect" class="form-input" style="background: rgba(13, 18, 40, 0.95); color: #fff;">
+            <option value="lighting">Unsafe / Flickering Street Lighting (Yellow)</option>
+            <option value="suspicious">Suspicious Loitering / Isolated Stretches (Red)</option>
+            <option value="road">Road Work / Blocked Sidewalk (Yellow)</option>
+            <option value="patrol">Active Police Security Patrol (Green)</option>
+            <option value="haven">Verified 24/7 Safe Haven / Help Desk (Green)</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="reportTitleInput" style="display: block; font-size: 0.74rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 4px; text-transform: uppercase;">
+            Headline / Location Landmark
+          </label>
+          <input type="text" id="reportTitleInput" class="form-input" placeholder="e.g. 5th Main Street Light Off" required>
+        </div>
+
+        <div>
+          <label for="reportDescInput" style="display: block; font-size: 0.74rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 4px; text-transform: uppercase;">
+            Specific Details / Helpful Advice
+          </label>
+          <textarea id="reportDescInput" class="form-input" rows="3" placeholder="Describe the safety observation and recommended alternate avenue..." required style="resize: vertical;"></textarea>
+        </div>
+
+        <div style="display: flex; gap: 10px; margin-top: 6px;">
+          <button type="button" id="cancelReportBtn" class="cancel-modal-btn" style="flex: 1;">Cancel</button>
+          <button type="submit" class="submit-btn" style="flex: 1;">
+            Submit Advisory
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Leaflet JavaScript CDN -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+
+  <!-- SafeRoutes Controller Script -->
+  <script src="js/saferoutes.js"></script>
+</body>
+</html>

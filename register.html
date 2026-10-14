@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="description" content="SafeHer – Professional Women's Safety System. Create your protected account for encrypted personal safety, automated emergency SOS dispatch, and community security.">
+  <meta name="keywords" content="SafeHer Registration, Women Safety System, Sign Up, Emergency SOS, Personal Security Account">
+  <meta name="theme-color" content="#070913">
+  
+  <title>SafeHer | Create Your SafeHer Account</title>
+
+  <!-- Google Fonts: Plus Jakarta Sans & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <!-- Core Stylesheets -->
+  <link rel="stylesheet" href="css/register.css">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="assets/icons/shield-logo.svg">
+</head>
+<body>
+
+  <!-- Ambient Animated Background Scene -->
+  <div class="ambient-scene" aria-hidden="true">
+    <canvas id="particleCanvas"></canvas>
+    <div class="orb orb-pink"></div>
+    <div class="orb orb-purple"></div>
+    <div class="orb orb-cyan"></div>
+    <div class="security-grid"></div>
+  </div>
+
+  <!-- Notification Toast Container -->
+  <div id="toastContainer" class="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- Main Registration Container -->
+  <main class="register-wrapper">
+    <div class="register-card" role="region" aria-label="SafeHer Account Registration Portal">
+      
+      <!-- Card Header: Brand Logo & Identity -->
+      <header class="card-header">
+        <div class="logo-container">
+          <div class="logo-pulse-ring" aria-hidden="true"></div>
+          <img src="assets/icons/shield-logo.svg" alt="SafeHer Shield Crest" class="logo-image" width="72" height="72">
+        </div>
+        <h1 class="app-title">Create Your <span class="brand-highlight">SafeHer</span> Account</h1>
+        <p class="app-tagline">
+          <span>Your Safety Journey Starts Here</span>
+          <span class="tagline-badge" aria-label="Encrypted protection status">Encrypted</span>
+        </p>
+      </header>
+
+      <!-- Registration Form -->
+      <form id="registerForm" class="login-form" novalidate>
+
+        <!-- Optional Profile Photo / Avatar Upload -->
+        <div class="avatar-upload-container">
+          <label class="avatar-preview-wrap" for="avatarInput" title="Upload an optional profile photo">
+            <img id="avatarImagePreview" class="avatar-image-preview" alt="Profile avatar preview">
+            <div id="avatarPlaceholder" class="avatar-placeholder-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                <circle cx="12" cy="13" r="4"></circle>
+              </svg>
+            </div>
+            <input 
+              type="file" 
+              id="avatarInput" 
+              class="avatar-upload-input" 
+              accept="image/png, image/jpeg, image/webp"
+              aria-label="Upload profile photo (optional)"
+            >
+          </label>
+          <div class="avatar-label-wrap">
+            <span>Profile Photo</span>
+            <span class="optional-tag">Optional</span>
+          </div>
+          <button type="button" id="removeAvatarBtn" class="remove-avatar-btn">Remove photo</button>
+        </div>
+
+        <!-- 2-Column Responsive Form Grid -->
+        <div class="form-grid-2">
+
+          <!-- 1. Full Name (Required, Full Width) -->
+          <div class="form-group grid-col-full" id="fullNameGroup">
+            <label for="fullNameInput" class="form-label">
+              <span>Full Name</span>
+              <span style="color: var(--primary-pink);" aria-hidden="true">*</span>
+            </label>
+            <div class="input-wrapper">
+              <span class="input-icon-left" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+              </span>
+              <input 
+                type="text" 
+                id="fullNameInput" 
+                name="fullName" 
+                class="form-input" 
+                placeholder="Enter your full name" 
+                autocomplete="name"
+                required
+                aria-describedby="fullNameError"
+              >
+            </div>
+            <div id="fullNameError" class="error-message" role="alert">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+              </svg>
+              <span class="error-text">Please enter your full name.</span>
+            </div>
+          </div>
+
+          <!-- 2. Email Address (Required) -->
+          <div class="form-group" id="emailGroup">
+            <label for="emailInput" class="form-label">
+              <span>Email Address</span>
+              <span style="color: var(--primary-pink);" aria-hidden="true">*</span>
+            </label>
+            <div class="input-wrapper">
+              <span class="input-icon-left" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                  <polyline points="22,6 12,13 2,6"></polyline>
+                </svg>
+              </span>
+              <input 
+                type="email" 
+                id="emailInput" 
+                name="email" 
+                class="form-input" 
+                placeholder="Enter your email address" 
+                autocomplete="email"
+                required
+                aria-describedby="emailError"
+              >
+            </div>
+            <div id="emailError" class="error-message" role="alert">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+              </svg>
+              <span class="error-text">Please enter your email address.</span>
+            </div>
+          </div>
+
+          <!-- 3. Mobile Number (Required) -->
+          <div class="form-group" id="mobileGroup">
+            <label for="mobileInput" class="form-label">
+              <span>Mobile Number</span>
+              <span style="color: var(--primary-pink);" aria-hidden="true">*</span>
+            </label>
+            <div class="input-wrapper">
+              <span class="input-icon-left" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+                  <line x1="12" y1="18" x2="12.01" y2="18"></line>
+                </svg>
+              </span>
+              <input 
+                type="tel" 
+                id="mobileInput" 
+                name="mobile" 
+                class="form-input" 
+                placeholder="Enter your mobile number" 
+                autocomplete="tel"
+                required
+                aria-describedby="mobileError"
+              >
+            </div>
+            <div id="mobileError" class="error-message" role="alert">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+              </svg>
+              <span class="error-text">Please enter your mobile number.</span>
+            </div>
+          </div>
+
+          <!-- 4. City or District (Optional, Full Width) -->
+          <div class="form-group grid-col-full" id="cityGroup">
+            <div class="label-row">
+              <label for="cityInput" class="form-label">
+                <span>City or District</span>
+              </label>
+              <span class="optional-tag">Optional</span>
+            </div>
+            <div class="input-wrapper">
+              <span class="input-icon-left" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                  <circle cx="12" cy="10" r="3"></circle>
+                </svg>
+              </span>
+              <input 
+                type="text" 
+                id="cityInput" 
+                name="city" 
+                class="form-input" 
+                placeholder="Enter your city or district" 
+                autocomplete="address-level2"
+              >
+            </div>
+          </div>
+
+          <!-- Emergency Contact Section (New Account Safety Setup) -->
+          <div class="emergency-contact-box grid-col-full" id="emergencyContactSection">
+            <div class="emergency-box-header">
+              <div class="emergency-title-group">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="var(--primary-pink)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                  <circle cx="12" cy="11" r="3"></circle>
+                  <path d="M12 7v1"></path>
+                </svg>
+                <span class="emergency-box-title">Add Emergency Contact</span>
+              </div>
+              <span class="emergency-badge">New Account Setup</span>
+            </div>
+
+            <p class="emergency-box-desc">
+              Existing official emergency helplines are already integrated on SafeHer. Add your personal emergency contact (parent, sibling, guardian, or friend) who will be notified in an SOS emergency.
+            </p>
+
+            <div class="emergency-inputs-grid">
+              <!-- Contact Name -->
+              <div class="form-group" id="emergencyNameGroup">
+                <label for="emergencyNameInput" class="form-label">
+                  <span>Contact Full Name</span>
+                  <span style="color: var(--primary-pink);" aria-hidden="true">*</span>
+                </label>
+                <div class="input-wrapper">
+                  <span class="input-icon-left" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                      <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                  </span>
+                  <input 
+                    type="text" 
+                    id="emergencyNameInput" 
+                    name="emergencyName" 
+                    class="form-input" 
+                    placeholder="e.g. Maya Sharma / Mother" 
+                    required
+                    aria-describedby="emergencyNameError"
+                  >
+                </div>
+                <div id="emergencyNameError" class="error-message" role="alert">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                  </svg>
+                  <span class="error-text">Please enter emergency contact's name.</span>
+                </div>
+              </div>
+
+              <!-- Relationship -->
+              <div class="form-group" id="emergencyRelationGroup">
+                <label for="emergencyRelationInput" class="form-label">
+                  <span>Relationship</span>
+                  <span style="color: var(--primary-pink);" aria-hidden="true">*</span>
+                </label>
+                <div class="input-wrapper">
+                  <span class="input-icon-left" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                      <circle cx="9" cy="7" r="4"></circle>
+                      <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                      <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                    </svg>
+                  </span>
+                  <select id="emergencyRelationInput" name="emergencyRelation" class="form-input select-styled" required aria-describedby="emergencyRelationError">
+                    <option value="" disabled selected>Select Relationship</option>
+                    <option value="Parent / Guardian">Parent / Guardian</option>
+                    <option value="Sister">Sister</option>
+                    <option value="Brother">Brother</option>
+                    <option value="Spouse / Partner">Spouse / Partner</option>
+                    <option value="Friend">Trusted Friend</option>
+                    <option value="Relative">Other Family / Relative</option>
+                  </select>
+                </div>
+                <div id="emergencyRelationError" class="error-message" role="alert">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                  </svg>
+                  <span class="error-text">Please choose a relationship.</span>
+                </div>
+              </div>
+
+              <!-- Contact Phone Number -->
+              <div class="form-group grid-col-full" id="emergencyPhoneGroup">
+                <label for="emergencyPhoneInput" class="form-label">
+                  <span>Emergency Mobile Number</span>
+                  <span style="color: var(--primary-pink);" aria-hidden="true">*</span>
+                </label>
+                <div class="input-wrapper">
+                  <span class="input-icon-left" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+                      <line x1="12" y1="18" x2="12.01" y2="18"></line>
+                    </svg>
+                  </span>
+                  <input 
+                    type="tel" 
+                    id="emergencyPhoneInput" 
+                    name="emergencyPhone" 
+                    class="form-input" 
+                    placeholder="Enter 10-digit emergency phone number" 
+                    autocomplete="tel"
+                    required
+                    aria-describedby="emergencyPhoneError"
+                  >
+                </div>
+                <div id="emergencyPhoneError" class="error-message" role="alert">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                  </svg>
+                  <span class="error-text">Please enter a valid 10-digit emergency contact phone number.</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 5. Password (Required) -->
+          <div class="form-group" id="passwordGroup">
+            <label for="passwordInput" class="form-label">
+              <span>Password</span>
+              <span style="color: var(--primary-pink);" aria-hidden="true">*</span>
+            </label>
+            <div class="input-wrapper">
+              <span class="input-icon-left" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                  <circle cx="12" cy="16" r="1"></circle>
+                </svg>
+              </span>
+              <input 
+                type="password" 
+                id="passwordInput" 
+                name="password" 
+                class="form-input" 
+                placeholder="Create a strong password" 
+                autocomplete="new-password"
+                required
+                aria-describedby="passwordError"
+              >
+              <button 
+                type="button" 
+                id="passwordToggleBtn" 
+                class="password-toggle-btn" 
+                aria-label="Show password" 
+                title="Show password"
+              >
+                <!-- Eye Icon (Show) -->
+                <svg id="eyeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+                <!-- Eye Off Icon (Hide) -->
+                <svg id="eyeOffIcon" style="display: none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                  <line x1="1" y1="1" x2="23" y2="23"></line>
+                </svg>
+              </button>
+            </div>
+
+            <!-- Password Strength Bar -->
+            <div class="password-strength-container" aria-live="polite">
+              <div class="strength-bar-track">
+                <div id="strengthBarFill" class="strength-bar-fill"></div>
+              </div>
+              <div class="strength-status-row">
+                <span id="strengthText" class="strength-text">Password Strength</span>
+                <span id="strengthHint" class="strength-hint">Min 8 chars</span>
+              </div>
+            </div>
+
+            <div id="passwordError" class="error-message" role="alert">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+              </svg>
+              <span class="error-text">Please enter a password.</span>
+            </div>
+          </div>
+
+          <!-- 6. Confirm Password (Required) -->
+          <div class="form-group" id="confirmPasswordGroup">
+            <label for="confirmPasswordInput" class="form-label">
+              <span>Confirm Password</span>
+              <span style="color: var(--primary-pink);" aria-hidden="true">*</span>
+            </label>
+            <div class="input-wrapper">
+              <span class="input-icon-left" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                  <circle cx="12" cy="16" r="1"></circle>
+                </svg>
+              </span>
+              <input 
+                type="password" 
+                id="confirmPasswordInput" 
+                name="confirmPassword" 
+                class="form-input" 
+                placeholder="Confirm your password" 
+                autocomplete="new-password"
+                required
+                aria-describedby="confirmPasswordError"
+              >
+              <button 
+                type="button" 
+                id="confirmToggleBtn" 
+                class="password-toggle-btn" 
+                aria-label="Show confirm password" 
+                title="Show confirm password"
+              >
+                <svg id="confirmEyeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+                <svg id="confirmEyeOffIcon" style="display: none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                  <line x1="1" y1="1" x2="23" y2="23"></line>
+                </svg>
+              </button>
+            </div>
+            <div id="confirmPasswordError" class="error-message" role="alert">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+              </svg>
+              <span class="error-text">Passwords do not match.</span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Terms and Privacy Consent -->
+        <div class="terms-row" id="termsGroup">
+          <label class="terms-label" for="termsConsent">
+            <input type="checkbox" id="termsConsent" class="hidden-checkbox" required>
+            <span class="custom-checkbox" aria-hidden="true">
+              <svg class="checkbox-check-icon" viewBox="0 0 24 24">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+            </span>
+            <span class="terms-text">
+              I agree to the <a href="#terms" class="terms-link">Terms of Service</a> and acknowledge the <a href="#privacy" class="terms-link">Privacy Policy</a> for emergency protection.
+            </span>
+          </label>
+        </div>
+        <div id="termsError" class="error-message" style="margin-top: -10px;" role="alert">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+          <span class="error-text">You must agree to the Terms of Service & Privacy Policy.</span>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" id="submitBtn" class="submit-btn" style="margin-top: 8px;">
+          <span class="btn-spinner" aria-hidden="true"></span>
+          <span class="btn-text">Create Account</span>
+          <svg class="btn-arrow-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
+        </button>
+
+      </form>
+
+      <!-- Card Footer: Navigation back to Login -->
+      <footer class="card-footer">
+        <p class="register-prompt">
+          Already have an account? 
+          <a href="index.html" class="register-link" id="loginLink">Sign In</a>
+        </p>
+
+        <div class="security-guarantee-badge">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            <polyline points="9 12 11 14 15 10"></polyline>
+          </svg>
+          <span>256-Bit SSL Encrypted &bull; 24/7 Women Protection</span>
+        </div>
+      </footer>
+
+    </div>
+  </main>
+
+  <!-- Optional Firebase SDK Hooks for Production -->
+  <!--
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
+  -->
+
+  <!-- Main Application Logic -->
+  <script src="js/register.js"></script>
+</body>
+</html>

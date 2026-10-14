@@ -1,0 +1,1059 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="description" content="SafeHer – Smart Women's Safety System. Emergency SOS, Real Road Routing, Cyber Safety Incident Reporting, Resources, and Personal Protection.">
+  <meta name="keywords" content="SafeHer, Women Safety, Emergency SOS, Live Location, Camera Evidence, Cyber Safety, Road Routing, OpenStreetMap">
+  <meta name="theme-color" content="#070913">
+
+  <title>SafeHer™ | Smart Women’s Safety System</title>
+
+  <!-- Google Fonts: Plus Jakarta Sans & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Leaflet Interactive Maps CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+
+  <!-- Core Dashboard Stylesheet -->
+  <link rel="stylesheet" href="css/dashboard.css">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="assets/icons/shield-logo.svg">
+</head>
+<body class="dashboard-body">
+
+  <!-- Ambient Animated Background Scene -->
+  <div class="ambient-scene" aria-hidden="true">
+    <canvas id="particleCanvas"></canvas>
+    <div class="orb orb-pink"></div>
+    <div class="orb orb-purple"></div>
+    <div class="orb orb-cyan"></div>
+    <div class="security-grid"></div>
+  </div>
+
+  <!-- Notification Toast Container -->
+  <div id="toastContainer" class="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- Top Sticky Navigation Bar -->
+  <nav class="dashboard-nav" aria-label="Main Navigation">
+    <div class="nav-inner">
+      <a href="#home" class="nav-brand" title="SafeHer Home">
+        <div class="nav-logo-wrap">
+          <img src="assets/icons/shield-logo.svg" alt="SafeHer Brand Logo" class="nav-logo-image" width="38" height="38">
+        </div>
+        <div class="nav-brand-text">
+          <span class="nav-brand-title">Safe<span class="brand-highlight">Her</span></span>
+          <span class="nav-brand-sub">Safety System</span>
+        </div>
+      </a>
+
+      <!-- Center Navigation Links: Home | Safety Routes | Cyber Safety | Safety Resources -->
+      <div class="nav-center-menu" role="tablist" aria-label="Dashboard Primary Views">
+        <button type="button" class="nav-tab-btn active" data-view="home" role="tab" aria-selected="true" id="navTabHome">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+          <span>Home</span>
+        </button>
+
+        <button type="button" class="nav-tab-btn" data-view="routes" role="tab" aria-selected="false" id="navTabRoutes">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6" cy="19" r="3"></circle><path d="M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15"></path><circle cx="18" cy="5" r="3"></circle></svg>
+          <span>Safety Routes</span>
+        </button>
+
+        <button type="button" class="nav-tab-btn" data-view="cybersafety" role="tab" aria-selected="false" id="navTabCyber">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+          <span>Cyber Safety / Report</span>
+        </button>
+
+        <button type="button" class="nav-tab-btn" data-view="resources" role="tab" aria-selected="false" id="navTabResources">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+          <span>Safety Resources</span>
+        </button>
+      </div>
+
+      <!-- Top-Right Actions: Settings ⚙️ + Profile + Logout -->
+      <div class="nav-actions">
+        <!-- Settings ⚙️ Icon Button -->
+        <button type="button" id="topNavSettingsBtn" class="nav-settings-btn" title="Open Settings & Privacy">
+          <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+          <span class="settings-nav-label">Settings</span>
+        </button>
+
+        <button type="button" id="navProfileChipBtn" class="nav-user-chip" title="View Profile">
+          <div id="navUserAvatar" class="nav-user-avatar">E</div>
+          <span id="navUserName" class="nav-user-name">Elena Vance</span>
+        </button>
+
+        <button type="button" id="navLogoutBtn" class="nav-logout-btn" title="Sign out safely">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+            <polyline points="16 17 21 12 16 7"></polyline>
+            <line x1="21" y1="12" x2="9" y2="12"></line>
+          </svg>
+          <span>Logout</span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Live Location Sharing Active Banner (Top alert) -->
+  <div id="dashboardLiveSharingBanner" class="dashboard-sharing-banner" style="display: none;" role="status">
+    <div class="sharing-banner-inner">
+      <div class="sharing-banner-status">
+        <span class="sharing-pulse-ring"></span>
+        <div>
+          <strong class="sharing-status-title">LIVE GPS LOCATION BROADCAST ACTIVE</strong>
+          <div class="sharing-status-sub">
+            Session tracking online &bull; <span id="dashSharingTimer">00:00</span> &bull; <span id="dashSharingCoords">Tracking...</span>
+          </div>
+        </div>
+      </div>
+      <div class="sharing-banner-actions">
+        <button type="button" id="dashCopyLinkBtn" class="banner-action-btn copy-btn">Copy Link</button>
+        <button type="button" id="dashStopSharingBtn" class="banner-action-btn stop-btn">Stop Sharing</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Multi-View Dashboard Container -->
+  <main class="dashboard-container">
+
+    <!-- ====================================================================
+         PAGE 1: HOME (MAIN EMERGENCY & SAFETY DASHBOARD)
+         ==================================================================== -->
+    <div id="view-home" class="dashboard-view active" role="tabpanel" aria-labelledby="navTabHome">
+
+      <!-- Welcome Banner -->
+      <section class="welcome-banner" aria-label="User Welcome">
+        <div class="welcome-left">
+          <h1 class="welcome-greeting">
+            Welcome back, <span id="welcomeUserName" class="user-name-highlight">Elena Vance</span>!
+          </h1>
+          <p class="welcome-message">
+            Your personal safety dashboard. Real-time GPS protection, emergency alert networks, and instant camera evidence dispatch are fully operational.
+          </p>
+        </div>
+
+        <div class="welcome-right">
+          <div class="live-clock-card" aria-label="Current Date and Time">
+            <div>
+              <div id="liveTime" class="live-clock-time">--:--:-- --</div>
+              <div id="liveDate" class="live-clock-date">Loading date...</div>
+            </div>
+          </div>
+          <div class="protection-badge">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+              <polyline points="9 12 11 14 15 10"></polyline>
+            </svg>
+            <span>24/7 Security Shield Online</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- HERO SOS EMERGENCY ACTIVATION CARD -->
+      <section class="sos-hero-card" aria-label="Emergency SOS Action Center">
+        <div class="sos-hero-content">
+          <div class="sos-hero-left">
+            <div class="sos-badge-tag">
+              <span class="pulse-dot" style="background-color: #ff3366;"></span>
+              <span>RAPID EMERGENCY PROTOCOL</span>
+            </div>
+            <h2 class="sos-hero-title">Emergency Response Center</h2>
+            <p class="sos-hero-desc">
+              Press the SOS button if you are in immediate danger or feel unsafe. This triggers your live GPS tracking, notifies all registered emergency contacts, alerts the nearby demo police station, and activates secure camera evidence capture.
+            </p>
+            <div class="sos-feature-tags">
+              <span class="sos-pill">📍 Live GPS Broadcast</span>
+              <span class="sos-pill">📲 Emergency Contacts Dispatch</span>
+              <span class="sos-pill">🚓 Demo Police Alert (8124845808)</span>
+              <span class="sos-pill">📸 50-Photo Evidence Capture</span>
+            </div>
+          </div>
+
+          <div class="sos-hero-right">
+            <!-- Large SOS Button -->
+            <button type="button" id="mainSosTriggerBtn" class="big-sos-btn" aria-label="Trigger Emergency SOS">
+              <div class="sos-btn-ripple"></div>
+              <div class="sos-btn-inner">
+                <span class="sos-btn-icon">🚨</span>
+                <span class="sos-btn-text">SOS</span>
+                <span class="sos-btn-sub">EMERGENCY</span>
+              </div>
+            </button>
+            <div class="sos-btn-hint">Tap to activate emergency protocol</div>
+          </div>
+        </div>
+
+        <!-- ACTIVE SOS SESSION CONSOLE (Displayed when SOS is triggered) -->
+        <div id="activeSosHud" class="active-sos-hud" style="display: none;" role="region" aria-live="assertive">
+          <div class="sos-hud-header">
+            <div class="sos-hud-title-wrap">
+              <span class="sos-active-badge">🚨 SOS BROADCAST ACTIVE</span>
+              <span class="sos-hud-timer" id="sosActiveTimer">00:00</span>
+            </div>
+            <div class="sos-hud-controls">
+              <a href="tel:8124845808" id="sosCallPoliceBtn" class="hud-action-btn call-police-btn">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                <span>Call Police (8124845808)</span>
+              </a>
+              <button type="button" id="sosCancelBtn" class="hud-action-btn cancel-sos-btn">
+                <span>Cancel / Stop SOS</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Step 1 to 4 Progress HUD -->
+          <div class="sos-steps-grid">
+            <!-- Step 1: Live Location -->
+            <div class="sos-step-card">
+              <div class="sos-step-label">
+                <span class="step-num">1</span>
+                <strong>Live GPS Tracking</strong>
+              </div>
+              <div id="sosLocationInfo" class="sos-step-val">Locking coordinates...</div>
+              <div class="sos-step-sub" id="sosShareLinkWrap">
+                <input type="text" id="sosLiveShareLink" class="form-input" readonly style="font-size:0.7rem; font-family:monospace; height:28px;">
+                <button type="button" id="sosCopyShareBtn" class="submit-btn" style="height:28px; font-size:0.7rem; padding:0 8px;">Copy</button>
+              </div>
+            </div>
+
+            <!-- Step 2: Emergency Contacts Alert -->
+            <div class="sos-step-card">
+              <div class="sos-step-label">
+                <span class="step-num">2</span>
+                <strong>Emergency Contacts Notified</strong>
+              </div>
+              <div id="sosContactsAlertStatus" class="sos-step-val">Querying Firestore contacts...</div>
+              <div id="sosContactsPills" class="sos-contacts-pills-list"></div>
+            </div>
+
+            <!-- Step 3: Configured Demo Police Station -->
+            <div class="sos-step-card">
+              <div class="sos-step-label">
+                <span class="step-num">3</span>
+                <strong>Police Station Alert</strong>
+              </div>
+              <div class="sos-step-val" style="color: #3b82f6;">
+                Demo Emergency: <strong>8124845808</strong>
+              </div>
+              <div class="sos-step-sub" style="font-size:0.72rem; color:var(--text-muted);">
+                * Configured demo emergency station. Auto-dispatched alert package.
+              </div>
+            </div>
+
+            <!-- Step 4: Live Camera Evidence Capture (50 Photos) -->
+            <div class="sos-step-card evidence-step-card">
+              <div class="sos-step-label">
+                <span class="step-num">4</span>
+                <strong>Emergency Camera Evidence</strong>
+              </div>
+              <div class="evidence-progress-row">
+                <span id="evidenceCounterBadge" class="evidence-counter-badge">Emergency Evidence: 0 / 50 photos</span>
+                <span id="evidenceStatusText" class="evidence-status-pill">Standby</span>
+              </div>
+              <div class="evidence-progress-bar-wrap">
+                <div id="evidenceProgressBar" class="evidence-progress-bar" style="width: 0%;"></div>
+              </div>
+              <div class="camera-preview-box">
+                <video id="sosCameraVideo" autoplay playsinline muted class="camera-feed"></video>
+                <canvas id="sosCameraCanvas" style="display: none;"></canvas>
+                <div id="cameraStatusOverlay" class="camera-overlay-note">
+                  <span>Camera permission required by browser. Evidence is securely stored in active session.</span>
+                </div>
+              </div>
+              <!-- Evidence Thumbnails Reel -->
+              <div id="evidenceThumbnailsReel" class="evidence-thumbnails-reel"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Quick Safety Overview Grid (Location & Quick Contacts) -->
+      <div class="dashboard-grid">
+        <!-- Current Location Card -->
+        <section class="dashboard-card" id="homeLocationCard">
+          <div class="card-title-row">
+            <div class="card-title-group">
+              <div class="card-title-icon cyan-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="22" y1="12" x2="18" y2="12"></line><line x1="6" y1="12" x2="2" y2="12"></line><line x1="12" y1="6" x2="12" y2="2"></line><line x1="12" y1="22" x2="12" y2="18"></line></svg>
+              </div>
+              <h2 class="card-title-text">Live Geolocation</h2>
+            </div>
+            <div id="homeLocStatusPill" class="card-status-pill pill-standby">
+              <span class="pulse-dot"></span>
+              <span id="homeLocStatusText">GPS Active</span>
+            </div>
+          </div>
+
+          <div class="location-meta-grid">
+            <div class="loc-meta-item">
+              <span class="loc-meta-label">Coordinates</span>
+              <span class="loc-meta-val"><span id="homeLatVal">12.9716</span>, <span id="homeLonVal">77.5946</span></span>
+            </div>
+            <div class="loc-meta-item">
+              <span class="loc-meta-label">Accuracy</span>
+              <span id="homeAccuracyVal" class="loc-meta-val">±18 meters</span>
+            </div>
+            <div class="loc-meta-item" style="grid-column: 1 / -1;">
+              <span class="loc-meta-label">Locality</span>
+              <span id="homeLocalityVal" class="loc-meta-val">Bengaluru Central Corridor</span>
+            </div>
+          </div>
+
+          <div class="map-container-wrap" style="height: 220px;">
+            <div id="homeMiniMap" style="width: 100%; height: 100%;"></div>
+          </div>
+
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
+            <button type="button" id="homeRefreshLocBtn" class="refresh-loc-btn">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+              <span>Refresh GPS</span>
+            </button>
+            <button type="button" class="nav-tab-btn" data-view="routes" style="padding:4px 10px; font-size:0.74rem;">
+              <span>Open Road Navigator &rarr;</span>
+            </button>
+          </div>
+        </section>
+
+        <!-- Quick Emergency Contacts Overview -->
+        <section class="dashboard-card">
+          <div class="card-title-row">
+            <div class="card-title-group">
+              <div class="card-title-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+              </div>
+              <h2 class="card-title-text">Registered Emergency Contacts</h2>
+            </div>
+            <button type="button" class="nav-tab-btn" data-view="settings" style="padding:4px 8px; font-size:0.72rem;">Manage</button>
+          </div>
+
+          <p style="font-size:0.8rem; color:var(--text-secondary); margin-top:-6px;">
+            Emergency network dynamically synchronized from Firebase Firestore.
+          </p>
+
+          <div id="homeContactsList" class="contacts-list" style="margin-top:8px;"></div>
+        </section>
+      </div>
+
+    </div>
+
+    <!-- ====================================================================
+         PAGE 2: SAFETY ROUTES (LEAFLET + OSRM + WOMEN'S SAFETY COMPLAINTS)
+         ==================================================================== -->
+    <div id="view-routes" class="dashboard-view" role="tabpanel" aria-labelledby="navTabRoutes">
+
+      <section class="welcome-banner">
+        <div class="welcome-left">
+          <div style="font-size: 0.78rem; color: var(--cyber-cyan); font-weight: 600; margin-bottom: 4px;">SafeHer &bull; Travel Intelligence</div>
+          <h1 class="welcome-greeting" style="font-size: 1.65rem;">
+            Safety Routes™ <span class="user-name-highlight">Road Navigator</span>
+          </h1>
+          <p class="welcome-message">
+            Calculates actual road-by-road navigation following the street network. Discovers registered women safety reports and complaints near searched destinations.
+          </p>
+        </div>
+        <div class="welcome-right">
+          <div class="protection-badge" style="background: rgba(16, 185, 129, 0.12); border-color: rgba(16, 185, 129, 0.4); color: #10b981;">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <span>OSRM Road Routing Active</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Dual Column Layout: Left Search & Side Panel | Right Map -->
+      <div class="routes-layout-grid">
+        <!-- Left Panel: Search & Nearby Complaints -->
+        <aside class="routes-control-panel">
+          <!-- Destination Search Box -->
+          <div class="dashboard-card">
+            <div class="card-title-row">
+              <div class="card-title-group">
+                <div class="card-title-icon cyan-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+                </div>
+                <h3 class="card-title-text" style="font-size: 1rem;">Find Safe Road Route</h3>
+              </div>
+            </div>
+
+            <div class="route-input-group" id="routesDestSearchWrap" style="margin-top: 10px;">
+              <div class="route-input-wrap">
+                <span class="route-input-icon dest-dot">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                </span>
+                <input type="text" id="routesDestInput" class="route-text-input" placeholder="Type destination (e.g. Brigade Road, Indiranagar)..." autocomplete="off">
+              </div>
+              <div id="routesDestSearchResults" class="map-search-dropdown" style="top:100%; margin-top:4px;"></div>
+            </div>
+
+            <div style="display:flex; gap:8px; margin-top:12px;">
+              <button type="button" id="routesCalculateBtn" class="submit-btn" style="flex:1;">
+                <span>Calculate Road Route</span>
+              </button>
+              <button type="button" id="routesResetBtn" class="cancel-modal-btn" style="padding:0 14px;">Reset</button>
+            </div>
+
+            <!-- Route Metrics Summary -->
+            <div id="routesMetricsSummary" class="route-metrics-box" style="display: none; margin-top: 12px;">
+              <div class="metrics-row">
+                <span id="routeDistBadge" class="metric-pill">0.0 km</span>
+                <span id="routeTimeBadge" class="metric-pill">0 mins</span>
+                <span class="metric-pill" style="color:#10b981; border-color:rgba(16,185,129,0.4);">Actual Road Network</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Side Panel: Women's Safety Complaints & Reports Near Searched Location -->
+          <div class="dashboard-card" id="nearbyComplaintsCard">
+            <div class="card-title-row">
+              <div class="card-title-group">
+                <div class="card-title-icon pink-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                </div>
+                <div>
+                  <h3 class="card-title-text" style="font-size: 0.95rem;">Safety Reports Near This Location</h3>
+                  <div style="font-size: 0.68rem; color: var(--text-muted);">Dynamically queried from Firestore &bull; Victim privacy protected</div>
+                </div>
+              </div>
+            </div>
+
+            <div id="nearbyComplaintsList" class="complaints-side-list" aria-live="polite">
+              <div class="complaints-empty-state">
+                Search a destination above to evaluate nearby registered women safety complaints and verified advisories.
+              </div>
+            </div>
+          </div>
+        </aside>
+
+        <!-- Right Panel: Full Leaflet Road Map -->
+        <section class="routes-map-panel">
+          <div class="dashboard-card" style="padding: 16px;">
+            <div class="map-container-wrap" style="height: 560px;" id="routesMapWrap">
+              <div id="routesLeafletMap" style="width: 100%; height: 100%;"></div>
+
+              <!-- Floating Map Navigation Tools -->
+              <div class="map-floating-toolbar">
+                <button type="button" id="routesMyLocBtn" class="map-tool-btn" title="Locate My Position">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon></svg>
+                </button>
+                <button type="button" id="routesZoomInBtn" class="map-tool-btn" title="Zoom In">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                </button>
+                <button type="button" id="routesZoomOutBtn" class="map-tool-btn" title="Zoom Out">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+    </div>
+
+    <!-- ====================================================================
+         PAGE 3: CYBER SAFETY / REPORT (INCIDENT REPORTING HUB)
+         ==================================================================== -->
+    <div id="view-cybersafety" class="dashboard-view" role="tabpanel" aria-labelledby="navTabCyber">
+
+      <section class="welcome-banner">
+        <div class="welcome-left">
+          <div style="font-size: 0.78rem; color: var(--primary-pink); font-weight: 600; margin-bottom: 4px;">Confidential & Secure Reporting</div>
+          <h1 class="welcome-greeting" style="font-size: 1.65rem;">
+            Cyber Safety &bull; <span class="user-name-highlight">Report an Incident</span>
+          </h1>
+          <p class="welcome-message">
+            Report safety hazards, stalking, harassment, or cyber threats. Submissions are verified and anonymously synchronized to the Safety Routes intelligence grid to protect fellow women.
+          </p>
+        </div>
+        <div class="welcome-right">
+          <button type="button" id="quickOpenReportBtn" class="submit-btn" style="background: linear-gradient(135deg, #ff2a6d, #8b3dff); box-shadow: 0 0 16px var(--primary-pink-glow);">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+            <span>+ Report an Incident</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- Main Incident Reporting Form Card -->
+      <section class="dashboard-card" id="incidentReportFormCard">
+        <div class="card-title-row">
+          <div class="card-title-group">
+            <div class="card-title-icon pink-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+            </div>
+            <div>
+              <h2 class="card-title-text">File Confidential Incident Complaint</h2>
+              <div style="font-size: 0.72rem; color: var(--text-muted);">Personal information is strictly protected and never displayed publicly</div>
+            </div>
+          </div>
+        </div>
+
+        <form id="cyberReportForm" class="report-form-grid">
+          <!-- 1. Incident Type -->
+          <div class="form-group">
+            <label for="incidentTypeSelect" class="form-label">1. Incident Type *</label>
+            <select id="incidentTypeSelect" class="form-input" required>
+              <option value="">Select Incident Category...</option>
+              <option value="Harassment">Harassment</option>
+              <option value="Stalking">Stalking</option>
+              <option value="Robbery">Robbery</option>
+              <option value="Cybercrime">Cybercrime</option>
+              <option value="Theft">Theft</option>
+              <option value="Threat">Threat</option>
+              <option value="Abuse">Abuse</option>
+              <option value="Sexual Harassment">Sexual Harassment</option>
+              <option value="Online Harassment">Online Harassment</option>
+              <option value="Fraud/Scam">Fraud / Scam</option>
+              <option value="Other">Other (Please Specify)</option>
+            </select>
+          </div>
+
+          <div class="form-group" id="otherTypeWrap" style="display: none;">
+            <label for="otherTypeInput" class="form-label">Specify Incident Category</label>
+            <input type="text" id="otherTypeInput" class="form-input" placeholder="e.g. Cyber Stalking / Blackmail">
+          </div>
+
+          <!-- 2. Incident Location (Interactive Map Picker) -->
+          <div class="form-group grid-span-2">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+              <label class="form-label" style="margin-bottom:0;">2. Incident Location (Interactive Pin Drop) *</label>
+              <button type="button" id="useGpsForReportBtn" class="use-my-loc-btn" style="position:static;">Use Current GPS</button>
+            </div>
+            <div style="display:flex; gap:8px; margin-bottom:8px;">
+              <input type="text" id="reportLocationSearch" class="form-input" placeholder="Search address or area for incident...">
+              <input type="text" id="reportLocationConfirmed" class="form-input" readonly placeholder="Selected Location Name..." style="flex:1.4;">
+            </div>
+            <div class="map-container-wrap" style="height: 240px;">
+              <div id="reportPickerMap" style="width: 100%; height: 100%;"></div>
+            </div>
+            <div style="font-size:0.72rem; color:var(--text-muted); margin-top:4px;">
+              * Drag the red pin on the map to accurately pinpoint the approximate incident location.
+            </div>
+          </div>
+
+          <!-- 3. Date and Time -->
+          <div class="form-group">
+            <label for="incidentDateInput" class="form-label">3. Incident Date *</label>
+            <input type="date" id="incidentDateInput" class="form-input" required>
+          </div>
+
+          <div class="form-group">
+            <label for="incidentTimeInput" class="form-label">Incident Time *</label>
+            <input type="time" id="incidentTimeInput" class="form-input" required>
+          </div>
+
+          <!-- 4. Describe the Incident -->
+          <div class="form-group grid-span-2">
+            <label for="incidentDescInput" class="form-label">4. Describe what happened *</label>
+            <textarea id="incidentDescInput" class="form-input" rows="4" placeholder="Provide detailed, factual description of the incident, individual descriptions, or online profiles involved..." required style="resize:vertical;"></textarea>
+          </div>
+
+          <!-- 5. Evidence Upload -->
+          <div class="form-group grid-span-2">
+            <label class="form-label">5. Upload Evidence (Images, Videos, Screenshots, Documents)</label>
+            <div class="evidence-drop-zone" id="evidenceDropZone">
+              <input type="file" id="evidenceFileInput" multiple accept="image/*,video/*,.pdf,.doc,.docx" style="display: none;">
+              <svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="var(--cyber-cyan)" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+              <div style="font-weight:600; color:#fff; margin-top:6px;">Drag & Drop files or click to browse</div>
+              <div style="font-size:0.74rem; color:var(--text-muted);">Supports PNG, JPG, MP4, PDF (Stored securely)</div>
+            </div>
+            <div id="evidenceFileList" class="evidence-files-list"></div>
+            <!-- Upload progress bar -->
+            <div id="uploadProgressBarWrap" class="evidence-progress-bar-wrap" style="display:none; margin-top:8px;">
+              <div id="uploadProgressBar" class="evidence-progress-bar" style="width:0%;"></div>
+            </div>
+          </div>
+
+          <!-- 6. Submit Report Button -->
+          <div class="form-group grid-span-2" style="margin-top: 10px;">
+            <button type="submit" id="submitReportBtn" class="submit-btn" style="height: 48px; font-size: 1rem;">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+              <span>Submit Confidential Report</span>
+            </button>
+          </div>
+        </form>
+      </section>
+
+      <!-- User Submitted Reports History Registry -->
+      <section class="dashboard-card" style="margin-top: 20px;">
+        <div class="card-title-row">
+          <div class="card-title-group">
+            <div class="card-title-icon cyan-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+            </div>
+            <h2 class="card-title-text">Recent Incident Logs & Moderation Status</h2>
+          </div>
+        </div>
+        <div id="myReportsHistoryList" class="reports-history-grid"></div>
+      </section>
+
+    </div>
+
+    <!-- ====================================================================
+         PAGE 4: SAFETY RESOURCES (EMERGENCY DIRECTORY + CALL NOW)
+         ==================================================================== -->
+    <div id="view-resources" class="dashboard-view" role="tabpanel" aria-labelledby="navTabResources">
+
+      <section class="welcome-banner">
+        <div class="welcome-left">
+          <div style="font-size: 0.78rem; color: #10b981; font-weight: 600; margin-bottom: 4px;">24/7 Verified Safety Directory</div>
+          <h1 class="welcome-greeting" style="font-size: 1.65rem;">
+            Emergency &bull; <span class="user-name-highlight">Safety Resources</span>
+          </h1>
+          <p class="welcome-message">
+            Instant telephone shortcuts and verified hotlines. One-tap direct dial for immediate crisis intervention and women assistance.
+          </p>
+        </div>
+      </section>
+
+      <!-- Safety Resources Cards Grid -->
+      <div class="resources-grid">
+
+        <!-- 1. Configured Demo Emergency Contact (8124845808) -->
+        <div class="resource-card priority-card">
+          <div class="resource-icon-wrap" style="background: rgba(255, 42, 109, 0.2); color: var(--primary-pink); border-color: rgba(255, 42, 109, 0.4);">
+            <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+          </div>
+          <div class="resource-body">
+            <div class="resource-badge demo-badge">Demo / Configured Emergency Contact</div>
+            <h3 class="resource-name">Police Station Emergency</h3>
+            <div class="resource-number">8124845808</div>
+            <p class="resource-desc">Pre-configured testing endpoint for emergency alert broadcast and direct voice helpline.</p>
+          </div>
+          <a href="tel:8124845808" class="resource-call-btn">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+            <span>Call Now</span>
+          </a>
+        </div>
+
+        <!-- 2. Police National Emergency -->
+        <div class="resource-card">
+          <div class="resource-icon-wrap" style="background: rgba(59, 130, 246, 0.2); color: #3b82f6;">
+            <span style="font-size: 24px;">🚓</span>
+          </div>
+          <div class="resource-body">
+            <div class="resource-badge">Official Helpline</div>
+            <h3 class="resource-name">Police Emergency Dispatch</h3>
+            <div class="resource-number">112 / 100</div>
+            <p class="resource-desc">Unified National Emergency Response System for immediate security dispatch.</p>
+          </div>
+          <a href="tel:112" class="resource-call-btn">Call 112</a>
+        </div>
+
+        <!-- 3. National Women's Helpline -->
+        <div class="resource-card">
+          <div class="resource-icon-wrap" style="background: rgba(236, 72, 153, 0.2); color: #ec4899;">
+            <span style="font-size: 24px;">👩</span>
+          </div>
+          <div class="resource-body">
+            <div class="resource-badge">Women Helpline</div>
+            <h3 class="resource-name">National Women in Distress</h3>
+            <div class="resource-number">1091 / 181</div>
+            <p class="resource-desc">24/7 dedicated helpline providing psychological, legal, and rescue assistance.</p>
+          </div>
+          <a href="tel:1091" class="resource-call-btn">Call 1091</a>
+        </div>
+
+        <!-- 4. Ambulance & Medical -->
+        <div class="resource-card">
+          <div class="resource-icon-wrap" style="background: rgba(239, 68, 68, 0.2); color: #ef4444;">
+            <span style="font-size: 24px;">🏥</span>
+          </div>
+          <div class="resource-body">
+            <div class="resource-badge">Medical Rescue</div>
+            <h3 class="resource-name">Ambulance Emergency</h3>
+            <div class="resource-number">108 / 102</div>
+            <p class="resource-desc">Emergency medical trauma service and paramedic dispatch.</p>
+          </div>
+          <a href="tel:108" class="resource-call-btn">Call 108</a>
+        </div>
+
+        <!-- 5. Fire & Rescue -->
+        <div class="resource-card">
+          <div class="resource-icon-wrap" style="background: rgba(249, 115, 22, 0.2); color: #f97316;">
+            <span style="font-size: 24px;">🚒</span>
+          </div>
+          <div class="resource-body">
+            <div class="resource-badge">Fire & Rescue</div>
+            <h3 class="resource-name">Fire Hazard Control</h3>
+            <div class="resource-number">101</div>
+            <p class="resource-desc">Rapid fire containment and disaster rescue units.</p>
+          </div>
+          <a href="tel:101" class="resource-call-btn">Call 101</a>
+        </div>
+
+        <!-- 6. National Cyber Crime Helpline -->
+        <div class="resource-card">
+          <div class="resource-icon-wrap" style="background: rgba(5, 217, 232, 0.2); color: var(--cyber-cyan);">
+            <span style="font-size: 24px;">🛡️</span>
+          </div>
+          <div class="resource-body">
+            <div class="resource-badge">Cyber Defense</div>
+            <h3 class="resource-name">Cyber Crime Helpline</h3>
+            <div class="resource-number">1930</div>
+            <p class="resource-desc">National cyber fraud, blackmail, and online harassment emergency desk.</p>
+          </div>
+          <a href="tel:1930" class="resource-call-btn">Call 1930</a>
+        </div>
+
+        <!-- 7. Emergency SOS Shortcut -->
+        <div class="resource-card action-shortcut-card">
+          <div class="resource-icon-wrap" style="background: rgba(255, 51, 102, 0.2); color: #ff3366;">
+            <span style="font-size: 24px;">🚨</span>
+          </div>
+          <div class="resource-body">
+            <div class="resource-badge">App Shortcut</div>
+            <h3 class="resource-name">Emergency SOS Protocol</h3>
+            <div class="resource-number">Broadcast Alert</div>
+            <p class="resource-desc">Activate live GPS sharing, camera snapshots, and contacts dispatch.</p>
+          </div>
+          <button type="button" class="resource-call-btn" onclick="document.getElementById('mainSosTriggerBtn').click();">
+            Trigger SOS
+          </button>
+        </div>
+
+        <!-- 8. Location Sharing Shortcut -->
+        <div class="resource-card action-shortcut-card">
+          <div class="resource-icon-wrap" style="background: rgba(16, 185, 129, 0.2); color: #10b981;">
+            <span style="font-size: 24px;">📍</span>
+          </div>
+          <div class="resource-body">
+            <div class="resource-badge">App Shortcut</div>
+            <h3 class="resource-name">Share Live Location</h3>
+            <div class="resource-number">Encrypted GPS</div>
+            <p class="resource-desc">Share a real-time tracking link with family and trusted contacts.</p>
+          </div>
+          <button type="button" class="resource-call-btn" id="resShareLocBtn">
+            Share Location
+          </button>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- ====================================================================
+         PAGE 5: SETTINGS ⚙️ (PROFILE, CONTACTS, GUARDIAN, PRIVACY & SECURITY)
+         ==================================================================== -->
+    <div id="view-settings" class="dashboard-view" role="tabpanel" aria-labelledby="topNavSettingsBtn">
+
+      <section class="welcome-banner">
+        <div class="welcome-left">
+          <div style="font-size: 0.78rem; color: #a855f7; font-weight: 600; margin-bottom: 4px;">System Preferences & Privacy</div>
+          <h1 class="welcome-greeting" style="font-size: 1.65rem;">
+            Account &bull; <span class="user-name-highlight">Settings & Security</span>
+          </h1>
+          <p class="welcome-message">
+            Manage your personal profile, configure emergency safety contacts, set parent/guardian controls, and audit browser permissions.
+          </p>
+        </div>
+      </section>
+
+      <!-- Settings Sub-Navigation Tabs -->
+      <div class="settings-tabs-bar" role="tablist">
+        <button type="button" class="settings-tab-btn active" data-subtab="profile">Profile Details</button>
+        <button type="button" class="settings-tab-btn" data-subtab="contacts">Emergency Contacts</button>
+        <button type="button" class="settings-tab-btn" data-subtab="guardian">Parent / Guardian</button>
+        <button type="button" class="settings-tab-btn" data-subtab="privacy">Privacy & Permissions</button>
+      </div>
+
+      <!-- Settings Tab 1: Profile -->
+      <div id="subtab-profile" class="settings-subtab-content active">
+        <section class="dashboard-card">
+          <div class="card-title-row">
+            <h2 class="card-title-text">Profile Information</h2>
+            <button type="button" id="openEditProfileBtn" class="settings-btn settings-btn-primary">Edit Profile</button>
+          </div>
+          <div class="profile-card-grid">
+            <div class="profile-avatar-large-wrap">
+              <div id="profileLargeAvatar" class="profile-avatar-large">E</div>
+            </div>
+            <div class="profile-details-list">
+              <div class="profile-detail-box">
+                <span class="profile-detail-label">Full Name</span>
+                <span id="profileFullName" class="profile-detail-val">Elena Vance</span>
+              </div>
+              <div class="profile-detail-box">
+                <span class="profile-detail-label">Registered Email</span>
+                <span id="profileEmail" class="profile-detail-val">elena@safeher.org</span>
+              </div>
+              <div class="profile-detail-box">
+                <span class="profile-detail-label">Mobile Number</span>
+                <span id="profilePhone" class="profile-detail-val">+91 98765 43210</span>
+              </div>
+              <div class="profile-detail-box">
+                <span class="profile-detail-label">City / District</span>
+                <span id="profileCity" class="profile-detail-val">Bengaluru</span>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- Settings Tab 2: Emergency Contacts CRUD -->
+      <div id="subtab-contacts" class="settings-subtab-content">
+        <section class="dashboard-card">
+          <div class="card-title-row">
+            <div>
+              <h2 class="card-title-text">Emergency Safety Contacts</h2>
+              <div style="font-size:0.74rem; color:var(--text-muted);">Stored in Firebase Firestore &bull; Notified during SOS</div>
+            </div>
+            <button type="button" id="openAddContactModalBtn" class="add-contact-btn">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+              <span>Add Contact</span>
+            </button>
+          </div>
+          <div id="settingsContactsList" class="contacts-list" style="margin-top:12px;"></div>
+        </section>
+      </div>
+
+      <!-- Settings Tab 3: Parent / Guardian Controls -->
+      <div id="subtab-guardian" class="settings-subtab-content">
+        <section class="dashboard-card">
+          <div class="card-title-row">
+            <h2 class="card-title-text">Parent / Guardian Safety Controls</h2>
+          </div>
+          <form id="guardianControlsForm" class="guardian-form-grid">
+            <div class="form-group">
+              <label for="guardianNameInput" class="form-label">Parent / Guardian Full Name</label>
+              <input type="text" id="guardianNameInput" class="form-input" placeholder="e.g. Robert Vance">
+            </div>
+            <div class="form-group">
+              <label for="guardianPhoneInput" class="form-label">Guardian Phone Number</label>
+              <input type="tel" id="guardianPhoneInput" class="form-input" placeholder="e.g. +91 99887 76655">
+            </div>
+            <div class="form-group grid-span-2">
+              <label class="form-label">Notification Preferences</label>
+              <div class="guardian-checkbox-group">
+                <label class="guardian-check-item">
+                  <input type="checkbox" id="guardSosPref" checked>
+                  <span>Notify guardian immediately whenever SOS is triggered</span>
+                </label>
+                <label class="guardian-check-item">
+                  <input type="checkbox" id="guardLocPref" checked>
+                  <span>Send live tracking link when traveling after 20:00 (Night Mode)</span>
+                </label>
+                <label class="guardian-check-item">
+                  <input type="checkbox" id="guardGeofencePref">
+                  <span>Alert guardian if travel deviates from planned SafeRoute</span>
+                </label>
+              </div>
+            </div>
+            <div class="form-group grid-span-2">
+              <button type="submit" class="submit-btn" style="width: auto; padding: 0 24px;">Save Guardian Preferences</button>
+            </div>
+          </form>
+        </section>
+      </div>
+
+      <!-- Settings Tab 4: Privacy & Permissions -->
+      <div id="subtab-privacy" class="settings-subtab-content">
+        <section class="dashboard-card">
+          <div class="card-title-row">
+            <h2 class="card-title-text">Device Permissions & Privacy Status</h2>
+          </div>
+          <div class="permissions-audit-grid">
+            <div class="permission-status-card">
+              <div class="permission-icon">📍</div>
+              <div class="permission-info">
+                <strong>Geolocation Access</strong>
+                <p>Required for live road routing and emergency coordinates.</p>
+              </div>
+              <span id="permLocBadge" class="perm-badge">Checking...</span>
+            </div>
+
+            <div class="permission-status-card">
+              <div class="permission-icon">📸</div>
+              <div class="permission-info">
+                <strong>Camera Access</strong>
+                <p>Activated strictly during SOS sessions for 50-photo evidence capture.</p>
+              </div>
+              <span id="permCamBadge" class="perm-badge">Checking...</span>
+            </div>
+
+            <div class="permission-status-card">
+              <div class="permission-icon">🔔</div>
+              <div class="permission-info">
+                <strong>Push Notifications</strong>
+                <p>High-priority alert dispatch for incoming safety advisories.</p>
+              </div>
+              <span id="permNotifBadge" class="perm-badge">Checking...</span>
+            </div>
+          </div>
+
+          <!-- Account Security Actions -->
+          <div class="settings-action-row" style="margin-top: 24px; padding-top: 18px; border-top: 1px solid var(--glass-border);">
+            <button type="button" id="openChangePasswordBtn" class="settings-btn settings-btn-secondary">Change Password</button>
+            <button type="button" id="settingsLogoutBtn" class="settings-btn settings-btn-secondary">Logout</button>
+            <button type="button" id="openDeleteAccountBtn" class="settings-btn settings-btn-danger">Delete Account</button>
+          </div>
+        </section>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Mobile Bottom Navigation Bar -->
+  <nav class="mobile-bottom-nav" aria-label="Mobile Bottom Navigation">
+    <button type="button" class="mobile-nav-item active" data-view="home">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+      <span>Home</span>
+    </button>
+    <button type="button" class="mobile-nav-item" data-view="routes">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6" cy="19" r="3"></circle><path d="M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15"></path><circle cx="18" cy="5" r="3"></circle></svg>
+      <span>Routes</span>
+    </button>
+    <button type="button" class="mobile-nav-item mobile-sos-item" id="mobileSosBtn">
+      <div class="mobile-sos-circle">SOS</div>
+      <span>Emergency</span>
+    </button>
+    <button type="button" class="mobile-nav-item" data-view="cybersafety">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+      <span>Report</span>
+    </button>
+    <button type="button" class="mobile-nav-item" data-view="settings">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+      <span>Settings</span>
+    </button>
+  </nav>
+
+  <!-- ========================================================================
+       MODALS: SOS Confirmation, Contacts, Profile, Change Password, Delete Acc
+       ======================================================================== -->
+
+  <!-- Modal 1: SOS Confirmation (Accidental Trigger Protection) -->
+  <div id="sosConfirmationModal" class="modal-backdrop" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="modal-content" style="max-width: 440px; text-align: center;">
+      <div style="width: 60px; height: 60px; border-radius: 50%; background: rgba(255, 51, 102, 0.2); border: 2px solid #ff3366; margin: 0 auto 14px; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 24px rgba(255, 51, 102, 0.5);">
+        <span style="font-size: 28px;">🚨</span>
+      </div>
+      <h3 style="font-size: 1.3rem; font-weight: 800; color: #fff; margin-bottom: 6px;">Trigger Emergency SOS?</h3>
+      <p style="font-size: 0.84rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 18px;">
+        This will immediately broadcast your live GPS coordinates, notify your registered emergency contacts, alert the demo police station, and start camera evidence capture (50 photos).
+      </p>
+      <div style="display: flex; gap: 10px;">
+        <button type="button" id="cancelSosConfirmBtn" class="cancel-modal-btn" style="flex: 1;">Cancel</button>
+        <button type="button" id="executeSosConfirmBtn" class="submit-btn" style="flex: 1.3; background: linear-gradient(135deg, #ff3366, #ff0055); box-shadow: 0 0 20px rgba(255,51,102,0.6);">
+          Yes, Trigger SOS
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 2: Add / Edit Emergency Contact -->
+  <div id="addContactModal" class="modal-backdrop" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="contactModalTitle">
+    <div class="modal-content">
+      <button type="button" id="closeContactModalBtn" class="modal-close-btn" aria-label="Close dialog">&times;</button>
+      <div class="modal-title" id="contactModalTitle">Add Emergency Contact</div>
+      <form id="contactForm" class="login-form">
+        <input type="hidden" id="contactEditId">
+        <div class="form-group">
+          <label for="contactNameInput" class="form-label">Contact Name *</label>
+          <input type="text" id="contactNameInput" class="form-input" placeholder="e.g. Maya Sharma" required>
+        </div>
+        <div class="form-group">
+          <label for="contactRelInput" class="form-label">Relationship / Role</label>
+          <input type="text" id="contactRelInput" class="form-input" placeholder="e.g. Sister, Mother, Friend, Guardian">
+        </div>
+        <div class="form-group">
+          <label for="contactPhoneInput" class="form-label">Mobile Number *</label>
+          <input type="tel" id="contactPhoneInput" class="form-input" placeholder="e.g. +91 98765 43210" required>
+        </div>
+        <div class="form-group">
+          <label class="guardian-check-item">
+            <input type="checkbox" id="contactIsTrusted" checked>
+            <span>Mark as Trusted Primary SOS Contact</span>
+          </label>
+        </div>
+        <div style="display: flex; gap: 10px; margin-top: 10px;">
+          <button type="button" id="cancelContactBtn" class="submit-btn" style="background: rgba(255,255,255,0.08); box-shadow: none; flex: 1;">Cancel</button>
+          <button type="submit" class="submit-btn" style="flex: 1.5;">Save to Firestore</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal 3: Edit Profile -->
+  <div id="editProfileModal" class="modal-backdrop" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="modal-content">
+      <button type="button" id="closeEditProfileBtn" class="modal-close-btn" aria-label="Close dialog">&times;</button>
+      <div class="modal-title">Edit Profile Details</div>
+      <form id="editProfileForm" class="login-form">
+        <div class="form-group">
+          <label for="editNameInput" class="form-label">Full Name</label>
+          <input type="text" id="editNameInput" class="form-input" required>
+        </div>
+        <div class="form-group">
+          <label for="editPhoneInput" class="form-label">Mobile Number</label>
+          <input type="tel" id="editPhoneInput" class="form-input" required>
+        </div>
+        <div class="form-group">
+          <label for="editCityInput" class="form-label">City or District</label>
+          <input type="text" id="editCityInput" class="form-input">
+        </div>
+        <div style="display: flex; gap: 10px; margin-top: 10px;">
+          <button type="button" id="cancelEditProfileBtn" class="cancel-modal-btn" style="flex: 1;">Cancel</button>
+          <button type="submit" class="submit-btn" style="flex: 1.5;">Update Profile</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal 4: Change Password -->
+  <div id="changePasswordModal" class="modal-backdrop" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="modal-content">
+      <button type="button" id="closePasswordModalBtn" class="modal-close-btn" aria-label="Close dialog">&times;</button>
+      <div class="modal-title">Change Security Password</div>
+      <form id="changePasswordForm" class="login-form">
+        <div class="form-group">
+          <label for="currentPasswordInput" class="form-label">Current Password</label>
+          <input type="password" id="currentPasswordInput" class="form-input" required>
+        </div>
+        <div class="form-group">
+          <label for="newPasswordInput" class="form-label">New Password (Min 8 Chars)</label>
+          <input type="password" id="newPasswordInput" class="form-input" required>
+        </div>
+        <div class="form-group">
+          <label for="confirmNewPasswordInput" class="form-label">Confirm New Password</label>
+          <input type="password" id="confirmNewPasswordInput" class="form-input" required>
+        </div>
+        <div style="display: flex; gap: 10px; margin-top: 10px;">
+          <button type="button" id="cancelPasswordBtn" class="cancel-modal-btn" style="flex: 1;">Cancel</button>
+          <button type="submit" class="submit-btn" style="flex: 1.5;">Update Password</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal 5: Delete Account Confirmation -->
+  <div id="deleteAccountModal" class="modal-backdrop" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="modal-content" style="max-width: 420px;">
+      <button type="button" id="closeDeleteAccountBtn" class="modal-close-btn" aria-label="Close dialog">&times;</button>
+      <div class="modal-title" style="color: var(--state-error);">Delete Account Permanently</div>
+      <p class="modal-desc">
+        This action is irreversible. All emergency contacts, reports, and session histories will be permanently wiped.
+      </p>
+      <div class="form-group" style="margin-top: 8px;">
+        <label for="deleteAccountConfirmInput" class="form-label" style="font-size: 0.8rem;">Type <strong>DELETE</strong> to confirm:</label>
+        <input type="text" id="deleteAccountConfirmInput" class="form-input" placeholder="DELETE">
+      </div>
+      <div style="display: flex; gap: 10px; margin-top: 10px;">
+        <button type="button" id="cancelDeleteAccountBtn" class="cancel-modal-btn" style="flex: 1;">Cancel</button>
+        <button type="button" id="confirmDeleteAccountBtn" class="submit-btn" style="background: var(--state-error); flex: 1.4;">Wipe Account</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Leaflet Map JS Library -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+
+  <!-- Dashboard Application Controller -->
+  <script src="js/dashboard.js"></script>
+</body>
+</html>
